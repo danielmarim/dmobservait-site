@@ -757,3 +757,44 @@ mark.var { background: var(--ink); color: #fff; font-size: .88em; font-weight: 6
   .dy-mascot img { width: 110px; height: 110px; }
 }
 @media (max-width: 360px) { .dy-sols ul { grid-template-columns: 1fr; } }
+
+/* 17 · LOJA DE EBOOKS (/loja/, venda pela Kiwify) --------------------------- */
+.ebooks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.ebook { display: flex; flex-direction: column; overflow: hidden; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.ebook-cover { display: grid; place-items: center; padding: 30px 24px; background: var(--tint); border-bottom: 1px solid var(--line); }
+.ebook-cover img, .ebook-cover-art { width: 176px; aspect-ratio: 2 / 3; height: auto; object-fit: cover; border-radius: 4px 10px 10px 4px; box-shadow: 0 20px 30px -18px rgba(23, 45, 53, .6); }
+.ebook-cover-art { display: flex; flex-direction: column; justify-content: space-between; gap: 12px; padding: 18px 16px 16px; background: var(--ink); color: #fff; border-left: 6px solid var(--lime); }
+.ebook-cover-art .mono-label { color: var(--lime); font-size: 10.5px; }
+.ebook-cover-art strong { font: 700 17px/1.22 var(--font-head); letter-spacing: -.01em; overflow-wrap: anywhere; }
+.ebook-cover-art .logo-mark { width: 34px; height: 34px; align-self: flex-end; }
+.ebook-body { display: flex; flex: 1; flex-direction: column; padding: 24px; }
+.ebook-tema { margin-bottom: 8px; font: 500 12px/1.4 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--lime-ink); }
+.ebook h3 { margin-bottom: 10px; font-size: clamp(20px, 1.8vw, 23px); }
+.ebook-desc { margin-bottom: 22px; color: var(--muted); font-size: 15.5px; line-height: 1.55; }
+.ebook-foot { display: flex; flex-direction: column; align-items: stretch; gap: 14px; margin-top: auto; padding-top: 18px; border-top: 2px solid var(--ink); }
+.ebook-preco .mono-label { display: block; color: var(--muted); font-size: 11px; }
+.ebook-preco strong { font: 700 24px/1.2 var(--font-head); color: var(--ink); letter-spacing: -.015em; }
+.ebook-publico { margin: -8px 0 18px; font-size: 15px; line-height: 1.5; color: var(--text); }
+.ebook-publico strong { color: var(--ink); }
+.ebook-conteudo { margin-bottom: 22px; }
+.ebook-conteudo .mono-label { margin-bottom: 6px; color: var(--muted); font-size: 11px; }
+.ebook-conteudo li { display: flex; gap: 10px; padding: 7px 0; border-top: 1px solid var(--line); font-size: 15px; line-height: 1.45; }
+.ebook-conteudo li .icon { width: 18px; height: 18px; flex: none; margin-top: 2px; color: var(--lime-ink); }
+/* um ebook só: cartão em destaque, capa à esquerda */
+.ebooks--um { grid-template-columns: minmax(0, 1fr); }
+.ebooks--um .ebook { flex-direction: row; }
+.ebooks--um .ebook-cover { flex: 0 0 38%; padding: 48px 32px; border-bottom: 0; border-right: 1px solid var(--line); }
+.ebooks--um .ebook-cover img { width: min(300px, 100%); }
+.ebooks--um .ebook-body { padding: 36px 40px; }
+.ebooks--um .ebook h3 { font-size: clamp(24px, 2.4vw, 32px); }
+.ebooks--um .ebook-conteudo ul { columns: 2; column-gap: 28px; }
+.ebooks--um .ebook-conteudo li { break-inside: avoid; }
+.ebooks--um .ebook-foot { flex-direction: row; align-items: center; justify-content: space-between; }
+.loja-passos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.loja-passos li { display: flex; align-items: flex-start; gap: 16px; padding: 24px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.loja-passos h3 { margin-bottom: 6px; font-size: 19px; }
+.loja-passos p { color: var(--muted); font-size: 15px; line-height: 1.5; }
+.loja-nota { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 28px; }
+@media (max-width: 1040px) { .ebooks { grid-template-columns: repeat(2, minmax(0, 1fr)); } .loja-passos { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 900px) { .ebooks--um .ebook { flex-direction: column; } .ebooks--um .ebook-cover { border-right: 0; border-bottom: 1px solid var(--line); padding: 32px 24px; } .ebooks--um .ebook-cover img { width: 220px; } .ebooks--um .ebook-body { padding: 24px; } .ebooks--um .ebook-conteudo ul { columns: 1; } }
+@media (max-width: 640px) { .ebooks { grid-template-columns: minmax(0, 1fr); } .ebooks--um .ebook-foot { flex-direction: column; align-items: stretch; } }

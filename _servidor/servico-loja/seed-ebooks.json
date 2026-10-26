@@ -1,0 +1,24 @@
+{
+  "ebooks": [
+    {
+      "titulo": "IA do Zero: Aprenda ChatGPT e Gemini em 7 Dias",
+      "descricao": "Aprenda a usar ChatGPT e Gemini em tarefas reais com um plano simples de 7 dias. E-book em português com 42 páginas, exercícios diários, 50 prompts prontos e checklist de aprendizado. Para iniciantes, sem exigir programação. Os 7 dias são um roteiro de prática; o aprendizado depende da sua dedicação.",
+      "preco": "R$ 19,90",
+      "checkout": "https://pay.kiwify.com.br/K2sQO76",
+      "tema": "Inteligência artificial",
+      "publico": "Pessoas sem familiaridade com tecnologia, estudantes, profissionais administrativos e curiosos.",
+      "capa": "/assets/loja/ia-do-zero.webp",
+      "conteudo": [
+        "Dia 1: entendendo a IA sem termos complicados",
+        "Dia 2: criando conta e usando o ChatGPT e o Gemini",
+        "Dia 3: escrevendo comandos eficientes",
+        "Dia 4: e-mails, currículos e apresentações",
+        "Dia 5: resumindo documentos e organizando estudos",
+        "Dia 6: mais produtividade com IA",
+        "Dia 7: a sua rotina pessoal com IA",
+        "Bônus: 50 prompts prontos, exercícios diários e checklist de aprendizado"
+      ],
+      "ativo": true
+    }
+  ]
+}

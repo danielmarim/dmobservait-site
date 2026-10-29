@@ -106,7 +106,14 @@ if (form) {
 
     if (!endpoint) {
       showPrepared(message, area);
-      setStatus(email || whatsapp ? 'Mensagem preparada. Nada foi enviado ainda: use os botões abaixo para enviar.' : 'Mensagem preparada. Nenhum dado foi enviado.');
+      // 29/10/2026: com WhatsApp configurado, o envio abre a conversa já com a mensagem (antes era preciso um segundo clique).
+      // window.open roda antes de qualquer await, ainda dentro do clique, para o navegador não bloquear a nova aba.
+      if (whatsapp) {
+        window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
+        setStatus('Abrimos o WhatsApp com a sua mensagem pronta: é só tocar em enviar por lá. Se não abriu, use os botões abaixo.');
+        return;
+      }
+      setStatus(email || whatsapp ?'Mensagem preparada. Nada foi enviado ainda: use os botões abaixo para enviar.' : 'Mensagem preparada. Nenhum dado foi enviado.');
       output.focus();
       return;
     }

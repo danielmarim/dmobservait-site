@@ -14,8 +14,10 @@
 //   Só para testes: CADASTRO_JSON (cadastro em texto), HOSTINGER_API (outra base), DM_SERV_DNS=desligado
 import http from 'node:http';
 import https from 'node:https';
+import tls from 'node:tls';
+import net from 'node:net';
 import { readFileSync, existsSync, mkdirSync, appendFileSync, statSync, renameSync, writeFileSync } from 'node:fs';
-import { createDecipheriv, createHmac, randomBytes, randomInt, timingSafeEqual, X509Certificate } from 'node:crypto';
+import { createDecipheriv, createHmac, randomBytes, randomInt, timingSafeEqual } from 'node:crypto';
 import { promises as dns } from 'node:dns';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -48,29 +50,37 @@ export function chamarAgente(vps, chave, metodo, caminho, corpo = '', { timeout 
     const h = cabecalhos(chave, metodo, cam, corpo);
     const mod = u.protocol === 'https:' ? https : http;
     const opts = { method: metodo, hostname: u.hostname, port: u.port || (u.protocol === 'https:' ? 443 : 80), path: cam, timeout, headers: { ...h, ...(corpo ? { 'content-type': 'application/json', 'content-length': Buffer.byteLength(corpo) } : {}) } };
-    if (u.protocol === 'https:' && vps.impressao) {
-      // certificado próprio da VPS: confere a impressão digital em vez da cadeia pública
-      opts.rejectUnauthorized = false;
-      opts.checkServerIdentity = () => undefined;
-    }
-    const req = mod.request(opts, (res) => {
-      if (u.protocol === 'https:' && vps.impressao) {
-        const cert = res.socket.getPeerX509Certificate?.();
-        const fp = cert ? new X509Certificate(cert.raw).fingerprint256.replace(/:/g, '').toLowerCase() : '';
-        if (fp !== String(vps.impressao).replace(/:/g, '').toLowerCase()) { res.destroy(); return falha(Object.assign(new Error('certificado do agente não confere'), { status: 502 })); }
-      }
-      const partes = []; let n = 0;
-      res.on('data', (c) => { n += c.length; if (n < 4 * 1024 * 1024) partes.push(c); });
-      res.on('end', () => {
-        const txt = Buffer.concat(partes).toString('utf8');
-        if (res.statusCode !== 401 && !conferirResposta(chave, { nonce: h['x-dm-nonce'], status: res.statusCode, corpo: txt, assinatura: res.headers['x-dm-resposta'] })) return falha(Object.assign(new Error('resposta do agente sem assinatura válida'), { status: 502 }));
-        let j = null; try { j = JSON.parse(txt); } catch {}
-        ok({ status: res.statusCode, dados: j });
+    // certificado próprio da VPS (vps.impressao): abre o TLS, confere a impressão digital SHA-256 e SÓ ENTÃO envia o pedido,
+    // para um impostor nunca receber a assinatura (que valeria 60 s). Com o certificado público (Traefik), a cadeia normal vale.
+    const enviar = (socket) => {
+      if (socket) { opts.createConnection = () => socket; opts.headers.connection = 'close'; } // um pedido por conexão verificada
+      const req = (socket ? http : mod).request(opts, (res) => { // sobre o socket TLS já verificado, o HTTP comum basta
+        const partes = []; let n = 0;
+        res.on('data', (c) => { n += c.length; if (n < 4 * 1024 * 1024) partes.push(c); });
+        res.on('end', () => {
+          const txt = Buffer.concat(partes).toString('utf8');
+          if (res.statusCode !== 401 && !conferirResposta(chave, { nonce: h['x-dm-nonce'], status: res.statusCode, corpo: txt, assinatura: res.headers['x-dm-resposta'] })) return falha(Object.assign(new Error('resposta do agente sem assinatura válida'), { status: 502 }));
+          let j = null; try { j = JSON.parse(txt); } catch {}
+          ok({ status: res.statusCode, dados: j });
+        });
       });
-    });
-    req.on('timeout', () => req.destroy(Object.assign(new Error('o agente demorou a responder'), { status: 504 })));
-    req.on('error', (e) => falha(Object.assign(e, { status: e.status || 502 })));
-    req.end(corpo || undefined);
+      req.on('timeout', () => req.destroy(Object.assign(new Error('o agente demorou a responder'), { status: 504 })));
+      req.on('error', (e) => falha(Object.assign(e, { status: e.status || 502 })));
+      req.end(corpo || undefined);
+    };
+    if (u.protocol === 'https:' && vps.impressao) {
+      const esperada = String(vps.impressao).replace(/:/g, '').toLowerCase();
+      const sock = tls.connect({ host: u.hostname, port: Number(opts.port), rejectUnauthorized: false, servername: net.isIP(u.hostname) ? undefined : u.hostname, timeout });
+      sock.once('timeout', () => { sock.destroy(); falha(Object.assign(new Error('o agente demorou a responder'), { status: 504 })); });
+      sock.once('error', (e) => falha(Object.assign(e, { status: 502 })));
+      sock.once('secureConnect', () => {
+        sock.setTimeout(0);
+        const fp = String(sock.getPeerCertificate()?.fingerprint256 || '').replace(/:/g, '').toLowerCase();
+        if (fp !== esperada) { sock.destroy(); return falha(Object.assign(new Error('certificado do agente não confere'), { status: 502 })); }
+        sock.removeAllListeners('error'); sock.on('error', () => {});
+        enviar(sock);
+      });
+    } else enviar(null);
   });
 }
 

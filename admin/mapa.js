@@ -421,7 +421,7 @@ ${secao('etapas', 'Próximas etapas', `<ol class="mp-etapas">${D.etapas.map((e) 
         `<rect class="mp-n mp-n--${esc(n.status)}${n.tipo === 'ia' ? ' mp-n--ia' : ''}" x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="10"/>` +
         `<text class="mp-cn mp-cn--g" x="${b.x + b.w / 2}" y="${b.y + 24}" text-anchor="middle" data-max="${b.w - 20}">${esc(n.nome)}</text>` +
         `<text class="mp-cr" x="${b.x + b.w / 2}" y="${b.y + 40}" text-anchor="middle" data-max="${b.w - 20}">${esc(n.sub || '')}</text>` +
-        (ROT[n.status] ? `<text class="mp-est mp-est--${esc(n.status)}" x="${b.x + b.w / 2}" y="${b.y + 55}" text-anchor="middle">${esc(ROT[n.status])}</text>` : '') + '</g>';
+        (ROT[n.status] ? `<text class="mp-est mp-est--${esc(n.status)}" x="${b.x + b.w / 2}" y="${b.y + 55}" text-anchor="middle" data-max="${b.w - 12}">${esc(ROT[n.status])}</text>` : '') + '</g>';
     }).join('');
     return `<svg viewBox="0 0 ${larguraTotal} ${alturaTotal}" role="group" aria-label="${esc(D.titulo)}" class="mp-svg mp-svg--dyno">${marcadores(pref)}${faixas}${ligs}${nos}</svg>`;
   };

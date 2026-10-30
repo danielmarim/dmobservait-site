@@ -69,3 +69,15 @@
 .ct-barra input[type="checkbox"], .ct-check input { min-height: 0; width: 18px; height: 18px; flex: none; padding: 0; }
 .ct-barra .ct-check { flex: none; }
 .ct-aud td:last-child { min-width: 260px; }
+
+/* Integrações > WhatsApp */
+.ct-wa { padding: 0 20px; }
+.ct-wa-linha { display: grid; grid-template-columns: minmax(180px, 1.3fr) minmax(160px, 1fr) auto; gap: 12px 18px; align-items: center; padding: 14px 0; border-top: 1px solid var(--line); }
+.ct-wa-linha:first-child { border-top: 0; }
+.ct-wa-nome { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ct-wa-nome strong { color: var(--ink); }
+.ct-wa-nome small { color: var(--muted); font-size: 13.5px; }
+.ct-wa-num { font: 600 16px var(--font-mono); color: var(--ink); white-space: nowrap; }
+.ct-wa-acoes { display: flex; gap: 8px; }
+.ct-wa-acoes .btn { min-height: 40px; padding: 8px 14px; }
+@media (max-width: 640px) { .ct-wa-linha { grid-template-columns: minmax(0, 1fr); } .ct-wa-num { white-space: normal; } }

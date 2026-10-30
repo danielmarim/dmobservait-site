@@ -59,7 +59,7 @@ export function chamarAgente(vps, chave, metodo, caminho, corpo = '', { timeout 
         res.on('data', (c) => { n += c.length; if (n < 4 * 1024 * 1024) partes.push(c); });
         res.on('end', () => {
           const txt = Buffer.concat(partes).toString('utf8');
-          if (res.statusCode !== 401 && !conferirResposta(chave, { nonce: h['x-dm-nonce'], status: res.statusCode, corpo: txt, assinatura: res.headers['x-dm-resposta'] })) return falha(Object.assign(new Error('resposta do agente sem assinatura válida'), { status: 502 }));
+          if (![401, 403].includes(res.statusCode) && !conferirResposta(chave, { nonce: h['x-dm-nonce'], status: res.statusCode, corpo: txt, assinatura: res.headers['x-dm-resposta'] })) return falha(Object.assign(new Error('resposta do agente sem assinatura válida'), { status: 502 }));
           let j = null; try { j = JSON.parse(txt); } catch {}
           ok({ status: res.statusCode, dados: j });
         });
@@ -198,7 +198,7 @@ export function criarServico({ cadastro = lerCadastro(), chaves = lerChaves(), d
     if (okAgente) status = 'em atividade';
     else if (host?.estado && host.estado !== 'running') status = 'parado';
     else if (base.agenteConfigurado) status = 'inacessível';
-    return { ...base, provedor: prov, status, maquina: okAgente ? maq.dados : null, erroAgente: base.agenteConfigurado && !okAgente ? (maq?.erro || `HTTP ${maq?.status}`) : null, hostinger: host, hostingerDisponivel: !!v.hostingerId, tokenHostinger: !!tokenHostinger };
+    return { ...base, provedor: prov, status, maquina: okAgente ? maq.dados : null, erroAgente: base.agenteConfigurado && !okAgente ? (maq?.erro || ({ 401: 'o agente recusou a assinatura (a chave desta VPS é diferente da do agente?)', 403: 'o agente recusou a origem do pedido (filtro AGENTE_IPS do agente)' }[maq?.status] || `agente respondeu HTTP ${maq?.status}`)) : null, hostinger: host, hostingerDisponivel: !!v.hostingerId, tokenHostinger: !!tokenHostinger };
   }
   async function projetosDe(v, stats = true) {
     const r = await agente(v, 'GET', `/v1/projetos${stats ? '' : '?stats=0'}`);

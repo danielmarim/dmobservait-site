@@ -201,7 +201,8 @@ const filtrarDados = (u) => {
   let d; try { d = JSON.parse(readFileSync(DADOS_JSON, 'utf8')); } catch { return null; }
   const mapa = { infra: 'infra', dynoAi: 'dyno' }; // o resto (MVPs, metas) é da Visão geral
   const ok = secoesDe(u);
-  return Object.fromEntries(Object.entries(d).filter(([k]) => ok.includes(mapa[k] || 'visao')));
+  // integracoes (números de WhatsApp das linhas) é só do Dono
+  return Object.fromEntries(Object.entries(d).filter(([k]) => (k === 'integracoes' ? u.papel === 'dono' : ok.includes(mapa[k] || 'visao'))));
 };
 
 // ---------- sessões e logins (tela "Atividades da conta") ----------

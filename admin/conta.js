@@ -297,6 +297,33 @@
     }
   }
 
-  const telas = { info: telaInfo, acessos: telaAcessos, seguranca: telaSeguranca, atividades: telaAtividades };
+  // ---------- Integrações > WhatsApp (só o Dono: o servidor entrega estes dados só a ele) ----------
+  async function telaWhatsapp() {
+    app.replaceChildren(...titulo('WhatsApp', 'Todas as linhas de WhatsApp da DM ObservaIT e do Dyno. Copie o número ou abra a conversa.'));
+    const r = await fetch('/admin/dados.json', { credentials: 'same-origin', headers: { accept: 'application/json' } });
+    if (r.status === 401) return location.assign('/admin/login');
+    const d = r.ok ? await r.json().catch(() => ({})) : {};
+    const lista = d.integracoes?.whatsapp;
+    if (!Array.isArray(lista)) return app.append(h('p', { class: 'ct-erro', role: 'alert' }, 'Estes números só aparecem para o Dono do painel.'));
+    const fmtNum = (n) => { const m = /^55(\d{2})(9?\d{4})(\d{4})$/.exec(n); return m ? `(${m[1]}) ${m[2]}-${m[3]}` : n; };
+    const rotuloLinha = (x) => x.linha + (x.detalhe ? `, ${x.detalhe}` : '');
+    const copiar = async (txt, botao) => {
+      try { await navigator.clipboard.writeText(txt); } catch { const t = h('textarea', { 'aria-hidden': 'true' }); t.value = txt; document.body.append(t); t.select(); document.execCommand('copy'); t.remove(); }
+      botao.dataset.copiado = '1'; const antes = botao.textContent; botao.textContent = 'Copiado'; setTimeout(() => { botao.textContent = antes; delete botao.dataset.copiado; }, 1500);
+    };
+    const cartao = h('div', { class: 'ct-cartao ct-wa' });
+    for (const x of lista) {
+      const num = fmtNum(x.numero);
+      const bCopiar = h('button', { type: 'button', class: 'btn btn--ghost ct-wa-copiar', 'aria-label': `Copiar o número de ${rotuloLinha(x)}`, onclick: () => copiar(num, bCopiar) }, 'Copiar');
+      cartao.append(h('div', { class: 'ct-wa-linha', 'data-id': x.id },
+        h('div', { class: 'ct-wa-nome' }, h('strong', {}, x.linha), x.detalhe ? h('small', {}, x.detalhe) : null),
+        h('code', { class: 'ct-wa-num' }, num),
+        h('div', { class: 'ct-wa-acoes' }, bCopiar, h('a', { class: 'btn btn--ghost', href: `https://wa.me/${x.numero}`, target: '_blank', rel: 'noopener noreferrer', 'aria-label': `Abrir a conversa com ${rotuloLinha(x)} no WhatsApp` }, 'Abrir'))));
+    }
+    const bTodos = h('button', { type: 'button', class: 'btn btn--ghost', onclick: () => copiar(lista.map((x) => `${rotuloLinha(x)}: ${fmtNum(x.numero)}`).join('\n'), bTodos) }, 'Copiar a lista inteira');
+    app.append(cartao, h('div', { class: 'ct-acoes' }, bTodos), h('small', { class: 'ct-dica' }, `${lista.length} linhas. Atualizado em ${d.integracoes.atualizadoEm || '—'}. Para mudar a lista, edite admin/integracoes.mjs e publique.`));
+  }
+
+  const telas = { whatsapp: telaWhatsapp, info: telaInfo, acessos: telaAcessos, seguranca: telaSeguranca, atividades: telaAtividades };
   (telas[tela] || telaInfo)().catch(() => aviso('Não foi possível carregar esta tela.', 'erro'));
 })();

@@ -56,3 +56,16 @@
   .adm-coluna { width: min(252px, calc(100vw - 84px)); }
 }
 @media (prefers-reduced-motion: reduce) { .adm-menu, .adm-chev { transition: none; } }
+
+/* quem está logado (preenchido por menu.js) */
+.adm-quem[hidden] { display: none; }
+.adm-quem-link { display: flex; align-items: center; gap: 10px; padding: 8px 10px; margin-bottom: 4px; border-radius: 10px; color: var(--ink); }
+.adm-quem-link:hover { background: var(--tint); }
+.adm-avatar { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 50%; background: var(--ink); color: #fff; font: 700 14px var(--font-head); }
+.adm-quem-txt { display: flex; flex-direction: column; min-width: 0; }
+.adm-quem-txt strong { font: 600 14px/1.3 var(--font-body); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adm-quem-txt small { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adm-rail li[hidden], .adm-itens li[hidden] { display: none; }
+.adm-quem { margin-top: auto; padding-top: 12px; }
+.adm-quem:not([hidden]) + .adm-rodape { margin-top: 0; }
+.adm-quem-link { margin-bottom: 8px; }

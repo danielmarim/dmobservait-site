@@ -1,0 +1,71 @@
+/* Seção "Conta" do /admin (informações, compartilhamento de acesso, segurança, atividades). Tema claro do painel. */
+.ct .container { max-width: 1080px; }
+.ct-status[data-tipo="ok"] { background: #e6f4d9; border-color: #b7d99a; }
+.ct-status[data-tipo="erro"] { background: #fde7e4; border-color: #e9b2ab; }
+.ct-cartao { margin: 0 0 20px; padding: 6px 20px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.ct-cartao > h2 { margin: 14px 0 6px; font-size: 18px; }
+.ct-linha { display: grid; grid-template-columns: minmax(150px, 240px) 1fr auto; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+.ct-cartao > h2 + .ct-linha { border-top: 0; }
+.ct-rotulo { font: 500 12px var(--font-mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.ct-valor { overflow-wrap: anywhere; }
+.ct-dica { display: block; margin: 8px 0 0; color: var(--muted); font-size: 13.5px; line-height: 1.5; }
+.ct-erro { margin: 0; padding: 10px 14px; border-radius: 10px; background: #fde7e4; color: #8c1d14; font-size: 14px; }
+.ct-vazio { padding: 36px 16px; text-align: center; color: var(--muted); }
+.ct-vazio strong { display: block; margin-bottom: 6px; color: var(--ink); font-size: 18px; }
+.ct-sub { margin: 36px 0 12px; font-size: 20px; }
+
+.ct-form { display: flex; flex-direction: column; gap: 14px; padding-top: 6px; }
+.ct-form label { display: flex; flex-direction: column; gap: 6px; font: 500 13px var(--font-body); color: var(--ink); }
+.ct-form input[type="text"], .ct-form input[type="email"], .ct-form input[type="date"], .ct-form input[type="search"], .ct-codigo input, .ct-barra input, .ct-pag select {
+  min-height: 42px; padding: 8px 12px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); font: 400 15px var(--font-body); color: var(--text); }
+.ct-dupla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.ct-acoes { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ct-form fieldset { margin: 0; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; }
+.ct-form legend { padding: 0 6px; font: 500 12px var(--font-mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.ct-opcao { flex-direction: row !important; align-items: flex-start; gap: 10px !important; padding: 8px 0; cursor: pointer; }
+.ct-opcao span { display: flex; flex-direction: column; gap: 2px; }
+.ct-opcao small { color: var(--muted); font-weight: 400; }
+.ct-secoes { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.ct-check { display: inline-flex !important; flex-direction: row !important; align-items: center; gap: 8px !important; }
+.ct-codigo { display: grid; grid-template-columns: minmax(160px, 220px) auto; gap: 8px 12px; align-items: end; }
+.ct-codigo small { grid-column: 1 / -1; }
+
+.ct-pessoas { display: flex; flex-direction: column; gap: 12px; }
+.ct-pessoa { padding: 16px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.ct-pessoa-topo { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.ct-pessoa-topo small { display: block; margin-top: 2px; color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+.ct-meta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 14px 0; }
+.ct-meta dt { font: 500 11px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.ct-meta dd { margin: 2px 0 0; font-size: 14px; overflow-wrap: anywhere; }
+.ct-perigo { color: #b3261e; border-color: #e3b5b0; }
+.ct-perigo-solido { background: #b3261e; border-color: #b3261e; color: #fff; }
+
+.ct-selo { display: inline-block; padding: 3px 10px; border-radius: 999px; font: 600 12px var(--font-body); white-space: nowrap; background: var(--tint); color: var(--ink); }
+.ct-selo--ativo { background: #e1f3d0; color: #2c5a0d; }
+.ct-selo--convite { background: #fdf0cf; color: #6b5000; }
+.ct-selo--suspenso { background: #eceae4; color: #55524a; }
+.ct-selo--expirado { background: #fde7e4; color: #8c1d14; }
+
+.ct-canais-linha { display: grid; grid-template-columns: minmax(140px, 1fr) auto auto auto; gap: 14px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.ct-barra { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; margin: 0 0 12px; }
+.ct-barra input { flex: 1 1 260px; }
+.ct-sessoes { min-width: 820px; }
+.ct-th { display: block; padding: 12px; font: 600 12px var(--font-mono); letter-spacing: .05em; text-transform: uppercase; color: var(--ink); }
+.ct-pag { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; margin-top: 12px; font-size: 14px; color: var(--muted); }
+.ct-pag-nav { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); }
+.ct-pag select { min-height: 36px; margin-left: 6px; }
+
+.ct-dialogo { width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 32px); padding: 22px 22px 18px; border: 1px solid var(--line-strong); border-radius: 16px; background: var(--surface); color: var(--text); overflow-y: auto; }
+.ct-dialogo::backdrop { background: rgba(20, 22, 18, .5); }
+.ct-dialogo h2 { margin: 0 0 12px; font-size: 20px; }
+
+@media (max-width: 720px) {
+  .ct-linha { grid-template-columns: 1fr; gap: 2px; }
+  .ct-dupla, .ct-meta { grid-template-columns: 1fr; }
+  .ct-canais-linha { grid-template-columns: 1fr 1fr; }
+  .ct-codigo { grid-template-columns: 1fr; }
+}
+
+.ct-barra input[type="checkbox"], .ct-check input { min-height: 0; width: 18px; height: 18px; flex: none; padding: 0; }
+.ct-barra .ct-check { flex: none; }
+.ct-aud td:last-child { min-width: 260px; }

@@ -4,7 +4,7 @@
   const passo1 = $('#lg-passo1'), passo2 = $('#lg-passo2'), aviso = $('#lg-aviso');
   const campo = $('#lg-destino'), rotulo = $('#lg-destino-rotulo'), canais = $('#lg-canais'), enviar = $('#lg-enviar');
   const recup = $('#lg-recuperar'), titulo = $('#lg-titulo-1'), codigo = $('#lg-codigo'), entrar = $('#lg-entrar');
-  let modoRecuperacao = false;
+  let modoRecuperacao = false, ticket = '';
   const msg = (texto, tipo) => { aviso.textContent = texto; aviso.dataset.tipo = tipo || ''; aviso.hidden = !texto; };
   const chamar = async (caminho, corpo) => {
     const r = await fetch(caminho, { method: 'POST', headers: { 'content-type': 'application/json', 'x-dm-admin': '1' }, body: JSON.stringify(corpo), credentials: 'same-origin' });
@@ -37,7 +37,7 @@
       if (r.status === 429) return msg(r.j.erro || 'Muitas tentativas. Aguarde alguns minutos.', 'erro');
       if (!r.ok) return msg('Não foi possível enviar agora. Tente de novo em instantes.', 'erro');
       // a mesma resposta vale para destino cadastrado ou não: nada aqui revela quem tem acesso
-      passo1.hidden = true; passo2.hidden = false;
+      ticket = r.j.ticket || ''; passo1.hidden = true; passo2.hidden = false;
       msg(r.j.mensagem || '', 'ok'); codigo.value = ''; codigo.focus();
     } catch { msg('Sem conexão. Tente de novo.', 'erro'); }
     finally { enviar.disabled = false; }
@@ -49,8 +49,8 @@
     if (c.length !== 6) return msg('O código tem 6 números.', 'erro');
     entrar.disabled = true;
     try {
-      const r = await chamar('/admin/auth/entrar', { codigo: c });
-      if (r.ok) { msg('Entrando…', 'ok'); location.assign('/admin/'); return; }
+      const r = await chamar('/admin/auth/entrar', { codigo: c, ticket });
+      if (r.ok) { msg('Entrando…', 'ok'); location.assign(r.j.destino || '/admin/'); return; }
       msg(r.j.erro || 'Código inválido ou expirado. Peça um novo código.', 'erro'); codigo.select();
     } catch { msg('Sem conexão. Tente de novo.', 'erro'); }
     finally { entrar.disabled = false; }

@@ -23,6 +23,20 @@
     });
   });
 
+  // quem está logado (nome e e-mail) e o que ele pode ver: o servidor é quem decide; aqui só se esconde o que não serve
+  fetch('/admin/auth/conta/eu', { headers: { 'x-dm-admin': '1' }, credentials: 'same-origin' }).then((r) => (r.ok ? r.json() : null)).then((eu) => {
+    if (!eu) return;
+    const quem = nav.querySelector('.adm-quem');
+    if (quem) {
+      quem.querySelector('.adm-quem-nome').textContent = eu.nome || '';
+      quem.querySelector('.adm-quem-email').textContent = eu.emailProprio || eu.whatsapp || '';
+      quem.querySelector('.adm-avatar').textContent = (eu.nome || '?').trim().charAt(0).toUpperCase();
+      quem.hidden = false;
+    }
+    nav.querySelectorAll('[data-secao]').forEach((li) => { if (!eu.secoes.includes(li.dataset.secao)) li.hidden = true; });
+    if (!eu.ehDono) nav.querySelectorAll('[data-so-dono]').forEach((li) => { li.hidden = true; });
+  }).catch(() => {});
+
   // gaveta (largura até 960 px): o botão abre; Esc, o fundo e a escolha de um link fecham
   const botao = document.querySelector('.adm-gaveta');
   const fundo = document.querySelector('.adm-fundo');

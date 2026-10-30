@@ -814,3 +814,15 @@ a.client:hover { border-color: var(--lime-deep); background: var(--tint); }
 .clients-foot p { margin: 0; color: var(--muted); }
 @media (max-width: 1040px) { .clients { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 560px) { .clients { grid-template-columns: minmax(0, 1fr); } }
+
+/* 19 · SELETOR DE IDIOMA (cabeçalho; i18n.mjs) -------------------------------- */
+.lang { position: relative; order: 1; flex: none; }
+.lang summary { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 10px; border: 1px solid var(--line-strong); border-radius: 10px; font: 600 13px/1 var(--font-mono); color: var(--ink); cursor: pointer; list-style: none; }
+.lang summary::-webkit-details-marker { display: none; }
+.lang summary .icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+.lang[open] summary, .lang summary:hover { border-color: var(--ink); }
+.lang ul { position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; min-width: 210px; margin: 0; padding: 6px; list-style: none; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 18px 30px -18px rgba(23, 45, 53, .45); }
+.lang a { display: block; padding: 10px 12px; border-radius: 8px; font-size: 15px; color: var(--ink); }
+.lang a:hover { background: var(--tint); }
+.lang a[aria-current] { font-weight: 600; background: var(--tint); box-shadow: inset 3px 0 0 var(--lime-deep); }
+@media (max-width: 960px) { .lang { order: 0; margin-left: auto; } .header-inner { gap: 12px; } }

@@ -98,7 +98,8 @@ const lerCorpo = async (req, max) => {
   for await (const p of req) { total += p.length; if (total > max) throw new Erro(413, 'Envio grande demais.'); partes.push(p); }
   return Buffer.concat(partes);
 };
-const json = async (req) => { try { return JSON.parse((await lerCorpo(req, 64 * 1024)).toString('utf8') || '{}'); } catch (e) { if (e instanceof Erro) throw e; throw new Erro(400, 'JSON inválido.'); } };
+// só objeto: null, número ou lista viram 400 (antes quebravam a rota com erro 500)
+const json = async (req) => { let v; try { v = JSON.parse((await lerCorpo(req, 64 * 1024)).toString('utf8') || '{}'); } catch (e) { if (e instanceof Erro) throw e; throw new Erro(400, 'JSON inválido.'); } if (!v || typeof v !== 'object' || Array.isArray(v)) throw new Erro(400, 'JSON inválido.'); return v; };
 const responder = (res, status, obj) => { res.writeHead(status, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' }); res.end(JSON.stringify(obj)); };
 
 const rotas = async (req, res) => {

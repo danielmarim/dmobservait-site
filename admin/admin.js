@@ -19,7 +19,7 @@
   const num = (v) => v.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
   const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 
-  const GRUPOS = { atual: 'Projeto atual · Dyno', dm: 'Projeto atual · DM', ideia1: 'Ideia · lista 1', ideia2: 'Ideia · lista 2' };
+  const GRUPOS = { atual: 'Projeto atual · Dyno', dm: 'Projeto atual · DM', ideia1: 'Ideia · lista 1', ideia2: 'Ideia · lista 2', ideia3: 'Ideia · internacional' };
   const SITUACOES = { uso: 'Em uso', piloto: 'Piloto', implantacao: 'Em implantação', planejado: 'Planejado', ideia: 'Ideia' };
 
   // campos calculados
@@ -182,6 +182,7 @@ ${pts.map(({ it, cx, cy }) => `<a href="#mvp-${it.id}" class="adm-g-ponto adm-g-
   });
   form.addEventListener('input', () => {
     for (const k of ['busca', 'grupo', 'situacao', 'iniciado']) estado[k] = form.elements[k].value;
+    estado.aba = 'auto'; // filtro novo volta para a nota mais alta que tem itens, para a tabela não ficar vazia
     salvar(); render();
   });
   form.addEventListener('submit', (e) => e.preventDefault());

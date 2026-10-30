@@ -84,12 +84,14 @@
 .adm-g-dm circle { fill: var(--ink); }
 .adm-g-ideia1 circle { fill: #c9a227; }
 .adm-g-ideia2 circle { fill: #7d8fa3; }
+.adm-g-ideia3 circle { fill: #b0603f; }
 .adm-legenda { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 10px; font-size: 13px; color: var(--muted); }
 .adm-legenda span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
 .adm-legenda .l-atual::before { background: #6f9a3a; }
 .adm-legenda .l-dm::before { background: var(--ink); }
 .adm-legenda .l-ideia1::before { background: #c9a227; }
 .adm-legenda .l-ideia2::before { background: #7d8fa3; }
+.adm-legenda .l-ideia3::before { background: #b0603f; }
 .adm-notas { margin-top: 32px; font-size: 13.5px; color: var(--muted); max-width: 90ch; }
 .adm-notas li { list-style: disc; margin: 0 0 6px 18px; }
 

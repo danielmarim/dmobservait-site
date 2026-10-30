@@ -7,7 +7,7 @@
 <ul class="adm-cartoes" id="adm-cartoes" aria-live="polite"></ul>
 <form class="adm-filtros" id="adm-filtros" role="search" aria-label="Filtrar MVPs">
 <label>Buscar<input type="search" name="busca" placeholder="Nome ou descrição"></label>
-<label>Grupo<select name="grupo"><option value="todos">Todos</option><option value="atuais">Projetos atuais</option><option value="atual">Atuais · Dyno</option><option value="dm">Atuais · DM</option><option value="ideias">Todas as ideias</option><option value="ideia1">Ideias · lista 1</option><option value="ideia2">Ideias · lista 2</option></select></label>
+<label>Grupo<select name="grupo"><option value="todos">Todos</option><option value="atuais">Projetos atuais</option><option value="atual">Atuais · Dyno</option><option value="dm">Atuais · DM</option><option value="ideias">Todas as ideias</option><option value="ideia1">Ideias · lista 1</option><option value="ideia2">Ideias · lista 2</option><option value="ideia3">Ideias · internacional</option></select></label>
 <label>Situação<select name="situacao"><option value="todas">Todas</option><option value="uso">Em uso</option><option value="piloto">Piloto</option><option value="implantacao">Em implantação</option><option value="planejado">Planejado</option><option value="ideia">Ideia</option></select></label>
 <label>Iniciado<select name="iniciado"><option value="todos">Todos</option><option value="true">Sim</option><option value="false">Não</option></select></label>
 </form>
@@ -16,7 +16,7 @@
 </tr></thead><tbody id="adm-linhas"></tbody></table></div>
 <section class="adm-bloco" aria-labelledby="adm-g-titulo"><h2 id="adm-g-titulo">Onde vale apostar</h2><p>Cada ponto é um item da tabela (com os filtros aplicados). Quanto mais alto e mais à esquerda, maior a chance de acerto com menos investimento. Clique num ponto para ir à linha.</p>
 <div class="adm-grafico" id="adm-grafico"></div>
-<p class="adm-legenda"><span class="l-atual">Projeto atual · Dyno</span><span class="l-dm">Projeto atual · DM</span><span class="l-ideia1">Ideia · lista 1</span><span class="l-ideia2">Ideia · lista 2</span></p></section>
+<p class="adm-legenda"><span class="l-atual">Projeto atual · Dyno</span><span class="l-dm">Projeto atual · DM</span><span class="l-ideia1">Ideia · lista 1</span><span class="l-ideia2">Ideia · lista 2</span><span class="l-ideia3">Ideia · internacional</span></p></section>
 <ul class="adm-notas">
 <li><b>Custo do MVP</b> = (horas já feitas + horas que faltam) × o valor da hora (<span id="adm-taxa">…</span>). Horas feitas dos projetos atuais vêm dos levantamentos de custo do Dyno; as demais são estimativas.</li>
 <li><b>Rentabilidade</b> = margem bruta estimada por cliente (preço menos IA, infraestrutura e taxa de cobrança). "Clientes-mês" é quantos meses de um cliente pagam o MVP.</li>

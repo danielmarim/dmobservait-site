@@ -1,5 +1,4 @@
 /* Tela /admin/loja. Usa os tokens de ../styles.css e as classes do painel (admin.css). */
-.adm-top nav { display: flex; flex-wrap: wrap; gap: 8px 20px; }
 .adm-status[data-tipo="ok"] { background: #edf6dc; border-color: #c9e39a; }
 .adm-status[data-tipo="erro"] { background: #fbe4e4; border-color: #e8b4b4; color: var(--danger); }
 .lj-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; align-items: start; }

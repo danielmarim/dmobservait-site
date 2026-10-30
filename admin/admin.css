@@ -21,6 +21,12 @@
 .adm-filtros input, .adm-filtros select { min-height: 42px; padding: 8px 12px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); font: 400 15px var(--font-body); color: var(--text); text-transform: none; letter-spacing: 0; }
 .adm-filtros label:first-child { flex: 1 1 220px; }
 
+.adm-abas { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.adm-abas button { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 14px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface); font: 600 14px var(--font-body); color: var(--ink); }
+.adm-abas button b { min-width: 24px; padding: 1px 7px; border-radius: 999px; background: var(--tint); font: 600 12px var(--font-mono); text-align: center; }
+.adm-abas button:hover { border-color: var(--ink); }
+.adm-abas button[aria-selected="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.adm-abas button[aria-selected="true"] b { background: var(--lime); color: var(--ink); }
 .adm-tabela-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
 .adm-tabela { width: 100%; min-width: 1080px; border-collapse: collapse; font-size: 14.5px; }
 .adm-tabela th { position: sticky; top: 0; z-index: 1; background: var(--tint); text-align: left; padding: 0; border-bottom: 1px solid var(--line-strong); white-space: nowrap; }

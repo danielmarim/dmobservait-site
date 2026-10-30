@@ -33,7 +33,7 @@
 
   // ---------- estado (filtros lembrados só neste navegador) ----------
   const CHAVE = 'dm-admin-filtros';
-  let estado = { busca: '', grupo: 'todos', situacao: 'todas', iniciado: 'todos', ordem: 'prob', dir: -1 };
+  let estado = { busca: '', grupo: 'todos', situacao: 'todas', iniciado: 'todos', ordem: 'prob', dir: -1, aba: 'auto' };
   try { estado = { ...estado, ...JSON.parse(localStorage.getItem(CHAVE) || '{}') }; } catch { /* sem armazenamento */ }
   const salvar = () => { try { localStorage.setItem(CHAVE, JSON.stringify(estado)); } catch { /* ignora */ } };
 
@@ -71,10 +71,43 @@
     ].map(([t, v, s]) => `<li><span class="adm-card-t">${t}</span><strong>${v}</strong><span class="adm-card-s">${s}</span></li>`).join('');
   };
 
+  // ---------- abas por nota: a tabela mostra só a aba escolhida, com os itens fechados ----------
+  const ABAS = [['5', 'Nota 5'], ['4', 'Nota 4'], ['3', 'Nota 3'], ['2', 'Nota 2'], ['01', 'Nota 0 e 1'], ['todas', 'Todas']];
+  const abaDe = (it) => (it.prob <= 1 ? '01' : String(it.prob));
+  const naAba = (it, aba) => aba === 'todas' || abaDe(it) === aba;
+  const abasEl = document.createElement('div');
+  abasEl.className = 'adm-abas';
+  abasEl.setAttribute('role', 'tablist');
+  abasEl.setAttribute('aria-label', 'Itens por nota de probabilidade');
+  const tabelaWrap = document.querySelector('.adm-tabela-wrap');
+  tabelaWrap.before(abasEl);
+  tabelaWrap.setAttribute('role', 'tabpanel');
+  // 'auto' = primeira aba com itens, da nota mais alta para a mais baixa
+  const abaAtual = (lista) => (estado.aba !== 'auto' ? estado.aba : (ABAS.find(([k]) => k !== 'todas' && lista.some((it) => naAba(it, k))) || ['todas'])[0]);
+  const renderAbas = (lista, aba) => {
+    abasEl.innerHTML = ABAS.map(([k, t]) => {
+      const n = lista.filter((it) => naAba(it, k)).length;
+      return `<button type="button" role="tab" id="aba-${k}" data-aba="${k}" aria-selected="${k === aba}" tabindex="${k === aba ? 0 : -1}" aria-controls="adm-tabela"><span>${t}</span><b>${n}</b></button>`;
+    }).join('');
+    tabelaWrap.setAttribute('aria-labelledby', `aba-${aba}`);
+  };
+  const escolherAba = (k, foco) => {
+    estado.aba = k; salvar(); render();
+    if (foco) document.getElementById(`aba-${k}`)?.focus();
+  };
+  abasEl.addEventListener('click', (e) => { const b = e.target.closest('[data-aba]'); if (b) escolherAba(b.dataset.aba); });
+  abasEl.addEventListener('keydown', (e) => {
+    const i = ABAS.findIndex(([k]) => k === document.activeElement?.dataset?.aba);
+    if (i < 0) return;
+    const j = e.key === 'ArrowRight' ? (i + 1) % ABAS.length : e.key === 'ArrowLeft' ? (i - 1 + ABAS.length) % ABAS.length : e.key === 'Home' ? 0 : e.key === 'End' ? ABAS.length - 1 : -1;
+    if (j >= 0) { e.preventDefault(); escolherAba(ABAS[j][0], true); }
+  });
+
   // ---------- tabela ----------
   const corpo = document.getElementById('adm-linhas');
   const pontos = (n) => `<span class="adm-prob adm-prob--${n}" role="img" aria-label="${n} de 5">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= n ? 'on' : ''}"></i>`).join('')}<b>${n}</b></span>`;
-  const renderTabela = (lista) => {
+  const renderTabela = (lista, aba) => {
+    const rotulo = ABAS.find(([k]) => k === aba)?.[1] || '';
     corpo.innerHTML = lista.map((it) => `<tr id="mvp-${it.id}" class="adm-linha">
 <td class="adm-nome"><button type="button" class="adm-abrir" aria-expanded="false" aria-controls="det-${it.id}"><span class="adm-seta" aria-hidden="true">▸</span><span>${esc(it.nome)}</span></button><span class="adm-chips"><span class="adm-chip adm-chip--${it.grupo}">${GRUPOS[it.grupo]}</span><span class="adm-chip adm-sit--${it.situacao}">${SITUACOES[it.situacao]}</span></span></td>
 <td><span class="adm-sn adm-sn--${it.iniciado ? 'sim' : 'nao'}">${it.iniciado ? 'Sim' : 'Não'}</span></td>
@@ -90,7 +123,7 @@
 <p><b>Por que essa nota.</b> ${esc(it.porque)}</p>
 <p><b>Próximo passo.</b> ${esc(it.proximo)}</p>
 <p><b>Conta.</b> ${num(it.hInv)} h feitas + ${num(it.hRest)} h restantes = ${num(it.horas)} h × ${brl(taxaHora)} = ${brl(it.custo)}. Lucro bruto por cliente: ${brl(it.lucroCliente, 2)}/mês.</p>
-</div></td></tr>`).join('') || '<tr><td colspan="8" class="adm-vazio">Nada encontrado com esses filtros.</td></tr>';
+</div></td></tr>`).join('') || `<tr><td colspan="8" class="adm-vazio">Nenhum item ${aba === 'todas' ? '' : `com ${rotulo.toLowerCase()} `}nos filtros atuais.</td></tr>`;
     document.querySelectorAll('#adm-tabela th[data-ordem]').forEach((th) => th.setAttribute('aria-sort', th.dataset.ordem === estado.ordem ? (estado.dir > 0 ? 'ascending' : 'descending') : 'none'));
   };
   corpo.addEventListener('click', (e) => {
@@ -131,7 +164,22 @@ ${pts.map(({ it, cx, cy }) => `<a href="#mvp-${it.id}" class="adm-g-ponto adm-g-
   // ---------- filtros ----------
   const form = document.getElementById('adm-filtros');
   for (const [nome, valor] of Object.entries(estado)) if (form.elements[nome]) form.elements[nome].value = valor;
-  const render = () => { const l = visiveis(); renderCartoes(l); renderTabela(l); renderGrafico(l); };
+  const render = () => {
+    const l = visiveis(), aba = abaAtual(l);
+    renderCartoes(l); renderAbas(l, aba); renderTabela(l.filter((it) => naAba(it, aba)), aba); renderGrafico(l);
+  };
+  // clique num ponto do gráfico: vai para a aba da nota do item, abre o item e rola até ele
+  grafico.addEventListener('click', (e) => {
+    const a = e.target.closest('a.adm-g-ponto');
+    if (!a) return;
+    e.preventDefault();
+    const it = itens.find((x) => `#mvp-${x.id}` === a.getAttribute('href'));
+    if (!it) return;
+    escolherAba(abaDe(it));
+    const b = document.querySelector(`#mvp-${it.id} .adm-abrir`);
+    if (b && b.getAttribute('aria-expanded') === 'false') b.click();
+    document.getElementById(`mvp-${it.id}`)?.scrollIntoView({ block: 'center' });
+  });
   form.addEventListener('input', () => {
     for (const k of ['busca', 'grupo', 'situacao', 'iniciado']) estado[k] = form.elements[k].value;
     salvar(); render();

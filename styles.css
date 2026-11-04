@@ -741,7 +741,7 @@ mark.var { background: var(--ink); color: #fff; font-size: .88em; font-weight: 6
 .dy-sol > p { margin: 0; color: var(--text); font-weight: 500; }
 .dy-sol ul { display: grid; gap: 8px; margin-top: 2px; }
 .dy-item { position: relative; padding-left: 20px; font-size: 15px; line-height: 1.5; color: var(--muted); }
-.dy-item::before { content: ""; position: absolute; left: 2px; top: .5em; width: 9px; height: 9px; border-radius: 50%; }
+.dy-item::before { content: ""; position: absolute; left: 2px; top: .5em; width: 9px; height: 9px; border-radius: 50%; background: var(--lime-deep); }
 .dy-item--uso::before { background: var(--lime-deep); }
 .dy-item--implantacao::before { background: #d9a520; }
 .dy-item--planejado::before { border: 1.5px solid var(--line-strong); }

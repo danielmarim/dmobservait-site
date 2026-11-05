@@ -10,6 +10,8 @@
 <label>Grupo<select name="grupo"><option value="todos">Todos</option><option value="atuais">Projetos atuais</option><option value="atual">Atuais · Dyno</option><option value="dm">Atuais · DM</option><option value="ideias">Todas as ideias</option><option value="ideia1">Ideias · lista 1</option><option value="ideia2">Ideias · lista 2</option><option value="ideia3">Ideias · internacional</option></select></label>
 <label>Situação<select name="situacao"><option value="todas">Todas</option><option value="uso">Em uso</option><option value="piloto">Piloto</option><option value="implantacao">Em implantação</option><option value="planejado">Planejado</option><option value="ideia">Ideia</option></select></label>
 <label>Iniciado<select name="iniciado"><option value="todos">Todos</option><option value="true">Sim</option><option value="false">Não</option></select></label>
+<label>Esforço<select name="esforco"><option value="todos">Todos</option><option value="facil">Fácil</option><option value="medio">Médio</option><option value="dificil">Difícil</option></select></label>
+<label>Custo<select name="custoOp"><option value="todos">Todos</option><option value="nenhum">Nenhum</option><option value="baixo">Baixo</option><option value="alto">Alto</option></select></label>
 </form>
 <div class="adm-tabela-wrap"><table class="adm-tabela" id="adm-tabela"><caption class="sr-only">Projetos e ideias de MVP</caption><thead><tr>
 <th scope="col" data-ordem="nome"><button type="button">Nome do MVP</button></th><th scope="col" data-ordem="iniciado"><button type="button">Iniciado</button></th><th scope="col" data-ordem="status"><button type="button">Status</button></th><th scope="col" data-ordem="custo"><button type="button">Custo do MVP</button></th><th scope="col" data-ordem="preco"><button type="button">Assinatura</button></th><th scope="col" data-ordem="impl"><button type="button">Implantação</button></th><th scope="col" data-ordem="margem"><button type="button">Rentabilidade</button></th><th scope="col" data-ordem="prob"><button type="button">Probabilidade</button></th>
@@ -20,7 +22,9 @@
 <ul class="adm-notas">
 <li><b>Custo do MVP</b> = (horas já feitas + horas que faltam) × o valor da hora (<span id="adm-taxa">…</span>). Horas feitas dos projetos atuais vêm dos levantamentos de custo do Dyno; as demais são estimativas.</li>
 <li><b>Rentabilidade</b> = margem bruta estimada por cliente (preço menos IA, infraestrutura e taxa de cobrança). "Clientes-mês" é quantos meses de um cliente pagam o MVP.</li>
-<li><b>Probabilidade</b> de 0 (sem chance de rodar e vender) a 5 (muita chance de vender e dar certo). Notas são estimativas iniciais, <b>sem pesquisa de mercado</b>: revise com dados reais.</li>
+<li><b>Probabilidade</b> de 0 (sem chance de rodar e vender) a 5 (muita chance de vender e dar certo). Notas revistas em 05/11/2026 com a análise de concorrência; continuam estimativas: revise com dados reais.</li>
+<li><b>Assinatura e implantação</b> são preços <b>sugeridos</b> pela análise de concorrência (05/11/2026); abra o item para ver o motivo.</li>
+<li><b>Esforço</b> (o que falta até vender): fácil = até ~30 h reaproveitando o que existe; médio = 31 a 70 h; difícil = mais de 70 h ou depende de terceiros. <b>Custo</b> (gasto para rodar, fora o tempo): nenhum = roda na estrutura de hoje; baixo = IA, mensagens ou API por uso, dentro da mensalidade; alto = serviço pago fixo, voz ou mídia com IA, venda em dólar ou jurídico.</li>
 </ul>
 </div></main></div></div>
 </body></html>

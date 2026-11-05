@@ -21,6 +21,8 @@
 
   const GRUPOS = { atual: 'Projeto atual · Dyno', dm: 'Projeto atual · DM', ideia1: 'Ideia · lista 1', ideia2: 'Ideia · lista 2', ideia3: 'Ideia · internacional' };
   const SITUACOES = { uso: 'Em uso', piloto: 'Piloto', implantacao: 'Em implantação', planejado: 'Planejado', ideia: 'Ideia' };
+  const ESFORCOS = { facil: 'Esforço fácil', medio: 'Esforço médio', dificil: 'Esforço difícil' };
+  const CUSTOS = { nenhum: 'Custo nenhum', baixo: 'Custo baixo', alto: 'Custo alto' };
 
   // campos calculados
   for (const it of itens) {
@@ -33,7 +35,7 @@
 
   // ---------- estado (filtros lembrados só neste navegador) ----------
   const CHAVE = 'dm-admin-filtros';
-  let estado = { busca: '', grupo: 'todos', situacao: 'todas', iniciado: 'todos', ordem: 'prob', dir: -1, aba: 'auto' };
+  let estado = { busca: '', grupo: 'todos', situacao: 'todas', iniciado: 'todos', esforco: 'todos', custoOp: 'todos', ordem: 'prob', dir: -1, aba: 'auto' };
   try { estado = { ...estado, ...JSON.parse(localStorage.getItem(CHAVE) || '{}') }; } catch { /* sem armazenamento */ }
   const salvar = () => { try { localStorage.setItem(CHAVE, JSON.stringify(estado)); } catch { /* ignora */ } };
 
@@ -43,6 +45,8 @@
       (estado.grupo === 'todos' || (estado.grupo === 'ideias' ? it.grupo.startsWith('ideia') : estado.grupo === 'atuais' ? !it.grupo.startsWith('ideia') : it.grupo === estado.grupo)) &&
       (estado.situacao === 'todas' || it.situacao === estado.situacao) &&
       (estado.iniciado === 'todos' || String(it.iniciado) === estado.iniciado) &&
+      (estado.esforco === 'todos' || it.esforco === estado.esforco) &&
+      (estado.custoOp === 'todos' || it.custoOp === estado.custoOp) &&
       (!q || `${it.nome} ${it.desc}`.toLowerCase().includes(q))
     ).sort((a, b) => {
       const k = estado.ordem, va = a[k], vb = b[k];
@@ -109,7 +113,7 @@
   const renderTabela = (lista, aba) => {
     const rotulo = ABAS.find(([k]) => k === aba)?.[1] || '';
     corpo.innerHTML = lista.map((it) => `<tr id="mvp-${it.id}" class="adm-linha">
-<td class="adm-nome"><button type="button" class="adm-abrir" aria-expanded="false" aria-controls="det-${it.id}"><span class="adm-seta" aria-hidden="true">▸</span><span>${esc(it.nome)}</span></button><span class="adm-chips"><span class="adm-chip adm-chip--${it.grupo}">${GRUPOS[it.grupo]}</span><span class="adm-chip adm-sit--${it.situacao}">${SITUACOES[it.situacao]}</span></span></td>
+<td class="adm-nome"><button type="button" class="adm-abrir" aria-expanded="false" aria-controls="det-${it.id}"><span class="adm-seta" aria-hidden="true">▸</span><span>${esc(it.nome)}</span></button><span class="adm-chips"><span class="adm-chip adm-chip--${it.grupo}">${GRUPOS[it.grupo]}</span><span class="adm-chip adm-sit--${it.situacao}">${SITUACOES[it.situacao]}</span>${it.esforco ? `<span class="adm-chip adm-esf--${it.esforco}">${ESFORCOS[it.esforco]}</span>` : ''}${it.custoOp ? `<span class="adm-chip adm-cop--${it.custoOp}">${CUSTOS[it.custoOp]}</span>` : ''}</span></td>
 <td><span class="adm-sn adm-sn--${it.iniciado ? 'sim' : 'nao'}">${it.iniciado ? 'Sim' : 'Não'}</span></td>
 <td><span class="adm-barra" role="img" aria-label="${it.status}%"><i style="width:${it.status}%"></i></span><span class="adm-pct">${it.status}%</span></td>
 <td class="adm-num"><strong>${brl(it.custo)}</strong><small>${num(it.horas)} h${it.hInv ? ` · ${num(it.hInv)} h feitas` : ''}</small></td>
@@ -122,6 +126,7 @@
 <p><b>O que é.</b> ${esc(it.desc)}</p>
 <p><b>Por que essa nota.</b> ${esc(it.porque)}</p>
 <p><b>Próximo passo.</b> ${esc(it.proximo)}</p>
+${it.precoPorque ? `<p><b>Preço sugerido.</b> ${esc(it.precoTxt)}${it.impl ? `; implantação ${brl(it.impl)}` : /implanta/i.test(it.precoTxt) ? '' : '; sem implantação'}. ${esc(it.precoPorque)}</p>` : ''}
 <p><b>Conta.</b> ${num(it.hInv)} h feitas + ${num(it.hRest)} h restantes = ${num(it.horas)} h × ${brl(taxaHora)} = ${brl(it.custo)}. Lucro bruto por cliente: ${brl(it.lucroCliente, 2)}/mês.</p>
 </div></td></tr>`).join('') || `<tr><td colspan="8" class="adm-vazio">Nenhum item ${aba === 'todas' ? '' : `com ${rotulo.toLowerCase()} `}nos filtros atuais.</td></tr>`;
     document.querySelectorAll('#adm-tabela th[data-ordem]').forEach((th) => th.setAttribute('aria-sort', th.dataset.ordem === estado.ordem ? (estado.dir > 0 ? 'ascending' : 'descending') : 'none'));
@@ -181,7 +186,7 @@ ${pts.map(({ it, cx, cy }) => `<a href="#mvp-${it.id}" class="adm-g-ponto adm-g-
     document.getElementById(`mvp-${it.id}`)?.scrollIntoView({ block: 'center' });
   });
   form.addEventListener('input', () => {
-    for (const k of ['busca', 'grupo', 'situacao', 'iniciado']) estado[k] = form.elements[k].value;
+    for (const k of ['busca', 'grupo', 'situacao', 'iniciado', 'esforco', 'custoOp']) estado[k] = form.elements[k].value;
     estado.aba = 'auto'; // filtro novo volta para a nota mais alta que tem itens, para a tabela não ficar vazia
     salvar(); render();
   });

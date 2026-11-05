@@ -42,6 +42,10 @@
 .adm-chip--dm { border-color: #24444f; color: #24444f; }
 .adm-sit--uso, .adm-sit--piloto { background: #e6f2d3; }
 .adm-sit--implantacao { background: #fdf0cf; }
+/* esforço e custo de operação: verde = bom, amarelo = médio, vermelho = pesado */
+.adm-esf--facil, .adm-cop--nenhum { background: #e6f2d3; color: #3d5a12; }
+.adm-esf--medio, .adm-cop--baixo { background: #fdf0cf; color: #6b4e00; }
+.adm-esf--dificil, .adm-cop--alto { background: #fbe3dc; color: #8a2e17; }
 .adm-sn { font-weight: 600; }
 .adm-sn--sim { color: var(--lime-ink); }
 .adm-sn--nao { color: var(--muted); }

@@ -161,7 +161,7 @@
       hairStyle: a.ceo ? 0 : h % 6, ph: (h % 628) / 100,
       status: a.ceo || a.breve || rm.ala === 'dyno' || rm.ala === 'wear' ? null : STATUS[h % 4],
       nome: a.ceo ? 'Daniel' : a.name,
-      caminho: null, passo: 0, espera: 1200 + (h % 5000), fila: [], missao: null, trava: 0, repath: 0, ultimoAlvo: ''
+      caminho: null, passo: 0, espera: 5000 + (h % 9000), fila: [], missao: null, trava: 0, repath: 0, ultimoAlvo: '', _fora: false
     };
   });
   for (const [c, r] of PORTAS) if (!livre(c, r)) erros.push('porta fechada ' + c + ',' + r);
@@ -360,19 +360,46 @@
     const n = perto(alvo.c + 1, alvo.r, 3);
     return n ? { c: n.c + 0.5, r: n.r + 0.5 } : { c: alvo.c + 1, r: alvo.r };
   }
-  function destinoRotina(a) {
-    const giro = a.ph + (a._giro || 0);
-    const n = giro % 5;
-    a._giro = (a._giro || 0) + 1 + Math.floor(Math.random() * 3);
-    if (n < 1.2) return { c: a.homeC, r: a.homeR };
-    if (n < 2.2) return vagaLivre(VAGAS.copa, a);
-    if (n < 3.2) return vagaLivre(VAGAS.desc, a);
-    if (n < 4.1) return vagaLivre(VAGAS.dir, a);
+  function passeioNaSala(a) {
     const rm = a.room;
+    if (!rm) return { c: a.homeC, r: a.homeR };
+    const livres = [];
     for (let r = rm.r; r < rm.r + rm.h; r++) for (let c = rm.c; c < rm.c + rm.w; c++) {
-      if (livre(c, r) && (c !== Math.floor(a.homeC) || r !== Math.floor(a.homeR))) return { c: c + 0.5, r: r + 0.5 };
+      if (!livre(c, r)) continue;
+      if (c === Math.floor(a.homeC) && r === Math.floor(a.homeR)) continue;
+      livres.push({ c: c + 0.5, r: r + 0.5 });
     }
-    return { c: a.homeC, r: a.homeR };
+    if (!livres.length) return { c: a.homeC, r: a.homeR };
+    return livres[Math.floor(Math.random() * livres.length)];
+  }
+  function destinoRotina(a) {
+    // Depois de um passeio raro fora da sala, volta direto para a mesa.
+    if (a._fora) {
+      a._fora = false;
+      return { c: a.homeC, r: a.homeR };
+    }
+    const roll = Math.random();
+    // ~5% dos giros: Copa ou Descompressão. Ninguém vai à Diretoria por rotina.
+    if (roll < 0.025) { a._fora = true; return vagaLivre(VAGAS.copa, a); }
+    if (roll < 0.05) { a._fora = true; return vagaLivre(VAGAS.desc, a); }
+    // Maior parte do tempo na própria mesa; de vez em quando uma volta curta na sala.
+    if (roll < 0.78) return { c: a.homeC, r: a.homeR };
+    return passeioNaSala(a);
+  }
+  function todosParaSalas() {
+    for (const a of agents) {
+      if (a.ceo || a.breve) continue;
+      // Missão a caminho do Daniel continua; Dyno Bot continua com o CEO.
+      if (a.missao && !a.missao.chegou) continue;
+      if (a.bot) continue;
+      a.c = a.homeC;
+      a.r = a.homeR;
+      a.caminho = null;
+      a.passo = 0;
+      a._fora = false;
+      a.ultimoAlvo = '';
+      a.espera = 8000 + Math.random() * 8000;
+    }
   }
 
   function limparTexto(s) {
@@ -394,7 +421,13 @@
     a.caminho = null;
     a.ultimoAlvo = '';
     if (prox) a.missao = { ...prox, lida: false, chegou: false };
-    else { a.missao = null; a.espera = 700; }
+    else {
+      a.missao = null;
+      a._fora = false;
+      a.caminho = astar(a, { c: a.homeC, r: a.homeR });
+      a.passo = 0;
+      a.espera = 8000 + Math.random() * 6000;
+    }
   }
 
   const FALAS = {
@@ -497,7 +530,8 @@
     const dest = destinoRotina(a);
     a.caminho = astar(a, dest);
     a.passo = 0;
-    a.espera = 4200 + Math.random() * 4600;
+    const naMesa = Math.hypot(a.c - a.homeC, a.r - a.homeR) < 0.45;
+    a.espera = naMesa ? 9000 + Math.random() * 9000 : 2800 + Math.random() * 3200;
   }
 
   function podeMover(oc, orr, nc, nr) {
@@ -1201,6 +1235,7 @@
   chip('wear', 'Dynamo Wear', '#ff7a1a');
   ROOMS.forEach((r) => chip(r.id, r.short, r.col));
   document.getElementById('centralizar').addEventListener('click', () => { seguir = true; focusId = ''; syncChips(); });
+  document.getElementById('para-salas').addEventListener('click', () => todosParaSalas());
   const btnFluxos = document.getElementById('fluxos');
   if (btnFluxos) btnFluxos.addEventListener('click', () => {
     fluxos = !fluxos;
@@ -1306,9 +1341,32 @@
     repouso: () => {
       for (const a of agents) {
         a.c = a.homeC; a.r = a.homeR; a.caminho = null; a.passo = 0;
-        a.missao = null; a.fila.length = 0; a.espera = 1e9; a.ultimoAlvo = '';
+        a.missao = null; a.fila.length = 0; a.espera = 1e9; a.ultimoAlvo = ''; a._fora = false;
       }
       demoEm = 1e15;
+    },
+    salas: () => todosParaSalas(),
+    amostraRotina: (n = 1000) => {
+      const c = { home: 0, copa: 0, desc: 0, dir: 0, sala: 0, outros: 0 };
+      const lista = agents.filter((a) => !a.ceo && !a.bot && !a.breve);
+      for (let i = 0; i < n; i++) {
+        const a = lista[i % lista.length];
+        a._fora = false;
+        const d = destinoRotina(a);
+        const id = (salaDe(d.c, d.r) || {}).id;
+        if (Math.abs(d.c - a.homeC) < 0.01 && Math.abs(d.r - a.homeR) < 0.01) c.home++;
+        else if (id === 'copa') c.copa++;
+        else if (id === 'desc') c.desc++;
+        else if (id === 'dir') c.dir++;
+        else if (id === a.roomId) c.sala++;
+        else c.outros++;
+      }
+      return c;
+    },
+    soltar: (nome) => { const a = achar(nome); if (a) soltar(a); },
+    pos: (nome) => {
+      const a = achar(nome);
+      return a ? { c: a.c, r: a.r, homeC: a.homeC, homeR: a.homeR, caminho: !!(a.caminho && a.caminho.length), missao: !!a.missao, bot: !!a.bot } : null;
     },
     card: (nome, x, y) => {
       const a = nome === 'Daniel' || nome === player.nome ? player : achar(nome);

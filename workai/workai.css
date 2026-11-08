@@ -52,7 +52,8 @@ h1 span { color: var(--gold); }
   min-height: 36px;
 }
 .sair:hover, .sair.is-on { border-color: var(--gold); color: var(--gold); }
-.acoes { display: flex; gap: 8px; align-items: center; flex: none; }
+.acoes { display: flex; gap: 8px; align-items: center; flex: none; flex-wrap: wrap; justify-content: flex-end; }
+#para-salas { font-size: 13px; }
 
 .salas {
   display: flex;

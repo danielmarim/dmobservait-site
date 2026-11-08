@@ -10,13 +10,13 @@
 
   const ROOMS = [
     { id: 'dir', name: 'Diretoria', short: 'Diretoria', col: '#f0d78c', c: 1, r: 0, w: 18, h: 4, glass: true, ala: 'dm' },
-    { id: 'op', name: 'DM Operação', sub: 'sala do head', short: 'Operação', col: '#e2b657', c: 1, r: 7, w: 4, h: 3, ala: 'dm' },
-    { id: 'sre', name: 'DM SRE & O11y', short: 'SRE & O11y', col: '#3ec6e0', c: 7, r: 7, w: 5, h: 3, ala: 'dm' },
-    { id: 'mkt', name: 'Dyno Marketing', short: 'Marketing', col: '#ff6fa8', c: 14, r: 7, w: 5, h: 3, ala: 'dm' },
-    { id: 'com', name: 'Dyno Comercial', short: 'Comercial', col: '#7dce7a', c: 1, r: 13, w: 4, h: 3, ala: 'dm' },
-    { id: 'prd', name: 'DM Produto & Receita', short: 'Produto', col: '#b18cff', c: 6, r: 13, w: 4, h: 3, ala: 'dm' },
-    { id: 'copa', name: 'Copa & Reuniões', short: 'Copa', col: '#e0c080', c: 11, r: 13, w: 4, h: 3, ala: 'dm', reuniao: true },
-    { id: 'desc', name: 'Sala de Descompressão', short: 'Descompressão', col: '#7ec8c3', c: 16, r: 13, w: 3, h: 3, ala: 'dm' },
+    { id: 'op', name: 'DM Operação', sub: 'sala do head', short: 'Operação', col: '#e2b657', c: 1, r: 6, w: 4, h: 3, ala: 'dm' },
+    { id: 'sre', name: 'DM SRE & O11y', short: 'SRE & O11y', col: '#3ec6e0', c: 7, r: 6, w: 5, h: 3, ala: 'dm' },
+    { id: 'mkt', name: 'Dyno Marketing', short: 'Marketing', col: '#ff6fa8', c: 14, r: 6, w: 5, h: 3, ala: 'dm' },
+    { id: 'com', name: 'Dyno Comercial', short: 'Comercial', col: '#7dce7a', c: 1, r: 12, w: 4, h: 3, ala: 'dm' },
+    { id: 'prd', name: 'DM Produto & Receita', short: 'Produto', col: '#b18cff', c: 6, r: 12, w: 4, h: 3, ala: 'dm' },
+    { id: 'copa', name: 'Copa & Reuniões', short: 'Copa', col: '#e0c080', c: 11, r: 12, w: 4, h: 3, ala: 'dm', reuniao: true },
+    { id: 'desc', name: 'Sala de Descompressão', short: 'Descompressão', col: '#7ec8c3', c: 16, r: 12, w: 3, h: 3, ala: 'dm' },
     { id: 'odyn', name: 'Dyno AI', sub: 'carro-chefe', short: 'Dyno AI', col: '#8fd46a', c: 1, r: 21, w: 10, h: 4, glass: true, ala: 'dyno' },
     { id: 'gab', name: 'Gabinete', short: 'Gabinete', col: '#f0d78c', c: 12, r: 21, w: 7, h: 4, ala: 'dyno' },
     { id: 'cres', name: 'Crescimento', short: 'Crescimento', col: '#f0a05a', c: 1, r: 27, w: 6, h: 3, ala: 'dyno' },
@@ -33,33 +33,33 @@
   const room = (id) => ROOMS.find((r) => r.id === id);
   const salaDe = (c, r) => ROOMS.find((rm) => c >= rm.c && r >= rm.r && c < rm.c + rm.w && r < rm.r + rm.h) || null;
 
-  const PORTAS = [[8, 4], [9, 4], [3, 6], [4, 6], [9, 6], [10, 6], [16, 6], [17, 6], [3, 10], [4, 10], [9, 10], [10, 10], [16, 10], [17, 10], [2, 12], [3, 12], [7, 12], [8, 12], [12, 12], [13, 12], [17, 12], [7, 20], [8, 20], [14, 20], [15, 20], [4, 24], [5, 24], [14, 24], [15, 24], [2, 26], [3, 26], [9, 26], [10, 26], [16, 26], [17, 26], [2, 30], [3, 30], [9, 30], [10, 30], [16, 30], [4, 32], [5, 32], [8, 32], [9, 32], [16, 32], [3, 44], [4, 44], [15, 44], [16, 44], [2, 46], [3, 46], [12, 46], [13, 46], [16, 46], [17, 46]];
+  const PORTAS = [[8, 4], [9, 4], [3, 5], [4, 5], [9, 5], [10, 5], [16, 5], [17, 5], [3, 9], [4, 9], [9, 9], [10, 9], [16, 9], [17, 9], [2, 11], [3, 11], [7, 11], [8, 11], [12, 11], [13, 11], [17, 11], [7, 20], [8, 20], [14, 20], [15, 20], [4, 24], [5, 24], [14, 24], [15, 24], [2, 26], [3, 26], [9, 26], [10, 26], [16, 26], [17, 26], [2, 30], [3, 30], [9, 30], [10, 30], [16, 30], [4, 32], [5, 32], [8, 32], [9, 32], [16, 32], [3, 44], [4, 44], [15, 44], [16, 44], [2, 46], [3, 46], [12, 46], [13, 46], [16, 46], [17, 46]];
   const VAGAS = {
-    copa: [[12, 13], [13, 13], [14, 13], [14, 15], [11, 14], [12, 15], [13, 15]],
-    desc: [[16, 13], [16, 14], [18, 13], [17, 13], [17, 14]],
+    copa: [[12, 12], [13, 12], [14, 12], [14, 14], [11, 13], [12, 14], [13, 14]],
+    desc: [[16, 12], [16, 13], [18, 12], [17, 12], [17, 13]],
     dir: [[4, 2], [4, 3], [11, 2], [12, 3], [14, 2], [15, 3], [16, 2], [3, 3]]
   };
 
   const RAW = [
     { room: 'dir', name: 'Daniel', role: 'CEO', ceo: true, c: 6.5, r: 3.1 },
     { room: 'dir', name: 'Dyno Bot', role: 'Gerente dos agentes', bot: true, c: 9.0, r: 3.1 },
-    { room: 'op', name: 'Recap AI', role: 'atas e follow-ups', desk: [2, 7], c: 2.5, r: 8.35 },
-    { room: 'sre', name: 'Dyno Atlas', role: 'engenharia de IA e DevOps', coord: true, desk: [8, 7], c: 8.5, r: 8.35 },
-    { room: 'sre', name: 'Stan', role: 'chamados N2/N3', desk: [11, 7], c: 11.5, r: 8.35 },
-    { room: 'sre', name: 'Observa AI', role: 'observabilidade e banco de dados', desk: [7, 9], c: 7.5, r: 8.35 },
-    { room: 'sre', name: 'Sentinela', role: 'segurança', shield: true, desk: [10, 9], c: 10.5, r: 8.35 },
-    { room: 'mkt', name: 'Zia', role: 'social media', coord: true, desk: [15, 7], c: 15.5, r: 8.35 },
-    { room: 'mkt', name: 'Trend AI', role: 'pautas do Instagram', desk: [17, 7], c: 17.5, r: 8.35 },
-    { room: 'mkt', name: 'Criativos AI', role: 'imagens e vídeos', desk: [16, 9], c: 16.5, r: 8.35 },
-    { room: 'mkt', name: 'Rank AI', role: 'SEO e textos dos sites', desk: [18, 9], c: 18.5, r: 8.35 },
-    { room: 'mkt', name: 'Scout AI', role: 'concorrentes', desk: [14, 9], c: 14.5, r: 8.35 },
-    { room: 'com', name: 'ProspectAI', role: 'prospecção B2B no Brasil', coord: true, desk: [2, 13], c: 2.5, r: 14.35 },
-    { room: 'com', name: 'Tráfego AI', role: 'anúncios (teto de R$ 15 por dia)', desk: [4, 13], c: 4.5, r: 14.35 },
-    { room: 'com', name: 'Tone AI', role: 'tom das mensagens', desk: [1, 15], c: 1.5, r: 14.35 },
-    { room: 'prd', name: 'Produto AI', role: 'PM das duas linhas', coord: true, desk: [7, 13], c: 7.5, r: 14.35 },
-    { room: 'prd', name: 'Receita AI', role: 'receita', desk: [9, 13], c: 9.5, r: 14.35 },
-    { room: 'prd', name: 'Spend AI', role: 'assinaturas e custos', desk: [6, 15], c: 6.5, r: 14.35 },
-    { room: 'prd', name: 'Sucesso AI', role: 'CS do Business', desk: [8, 15], c: 8.5, r: 14.35 },
+    { room: 'op', name: 'Recap AI', role: 'atas e follow-ups', desk: [2, 6], c: 2.5, r: 7.35 },
+    { room: 'sre', name: 'Dyno Atlas', role: 'engenharia de IA e DevOps', coord: true, desk: [8, 6], c: 8.5, r: 7.35 },
+    { room: 'sre', name: 'Stan', role: 'chamados N2/N3', desk: [11, 6], c: 11.5, r: 7.35 },
+    { room: 'sre', name: 'Observa AI', role: 'observabilidade e banco de dados', desk: [7, 8], c: 7.5, r: 7.35 },
+    { room: 'sre', name: 'Sentinela', role: 'segurança', shield: true, desk: [10, 8], c: 10.5, r: 7.35 },
+    { room: 'mkt', name: 'Zia', role: 'social media', coord: true, desk: [15, 6], c: 15.5, r: 7.35 },
+    { room: 'mkt', name: 'Trend AI', role: 'pautas do Instagram', desk: [17, 6], c: 17.5, r: 7.35 },
+    { room: 'mkt', name: 'Criativos AI', role: 'imagens e vídeos', desk: [16, 8], c: 16.5, r: 7.35 },
+    { room: 'mkt', name: 'Rank AI', role: 'SEO e textos dos sites', desk: [18, 8], c: 18.5, r: 7.35 },
+    { room: 'mkt', name: 'Scout AI', role: 'concorrentes', desk: [14, 8], c: 14.5, r: 7.35 },
+    { room: 'com', name: 'ProspectAI', role: 'prospecção B2B no Brasil', coord: true, desk: [2, 12], c: 2.5, r: 13.35 },
+    { room: 'com', name: 'Tráfego AI', role: 'anúncios (teto de R$ 15 por dia)', desk: [4, 12], c: 4.5, r: 13.35 },
+    { room: 'com', name: 'Tone AI', role: 'tom das mensagens', desk: [1, 14], c: 1.5, r: 13.35 },
+    { room: 'prd', name: 'Produto AI', role: 'PM das duas linhas', coord: true, desk: [7, 12], c: 7.5, r: 13.35 },
+    { room: 'prd', name: 'Receita AI', role: 'receita', desk: [9, 12], c: 9.5, r: 13.35 },
+    { room: 'prd', name: 'Spend AI', role: 'assinaturas e custos', desk: [6, 14], c: 6.5, r: 13.35 },
+    { room: 'prd', name: 'Sucesso AI', role: 'CS do Business', desk: [8, 14], c: 8.5, r: 13.35 },
     { room: 'odyn', name: 'Dyno AI', role: 'assistente do produto', destaque: true, tom: '#7dce6a', sit: 'Carro-chefe', cuida: 'Atende quem usa o produto.', nunca: 'Age fora da permissão do produto.', c: 3.5, r: 23.35 },
     { room: 'odyn', name: 'Dina', role: 'agenda e rotina', tom: '#e48ab0', sit: 'Com o Dyno AI', cuida: 'Agenda, lembretes e rotina.', nunca: 'Decide dinheiro ou publica sozinha.', c: 6.5, r: 23.35 },
     { room: 'gab', name: 'Brief AI', role: 'ponte de gestão', brief: true, sit: 'No ar', nivel: '0 · só lê', cuida: 'A mensagem das 9h e a fila única de aprovações.', nunca: 'Executa o que está na fila.', desk: [13, 22], c: 14.5, r: 23.35 },
@@ -99,17 +99,17 @@
   function fill(c0, r0, c1, r1, v = 1) {
     for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) mark(c, r, v);
   }
-  fill(1, 0, 18, 3); fill(1, 5, 18, 5); fill(5, 5, 6, 11); fill(12, 5, 13, 11);
-  fill(1, 7, 4, 9); fill(7, 7, 11, 9); fill(14, 7, 18, 9); fill(1, 11, 18, 11);
-  fill(1, 13, 4, 15); fill(6, 13, 9, 15); fill(11, 13, 14, 15); fill(16, 13, 18, 15);
-  fill(5, 11, 5, 19); fill(10, 11, 10, 19); fill(4, 16, 6, 19); fill(9, 16, 11, 19); fill(1, 19, 18, 19);
+  fill(1, 0, 18, 3); fill(1, 4, 18, 4); fill(5, 4, 6, 10); fill(12, 4, 13, 10);
+  fill(1, 6, 4, 8); fill(7, 6, 11, 8); fill(14, 6, 18, 8); fill(1, 10, 18, 10);
+  fill(1, 12, 4, 14); fill(6, 12, 9, 14); fill(11, 12, 14, 14); fill(16, 12, 18, 14);
+  fill(5, 10, 5, 19); fill(10, 10, 10, 19); fill(4, 15, 6, 19); fill(9, 15, 11, 19); fill(1, 19, 18, 19);
   fill(1, 21, 10, 23); fill(12, 21, 18, 23); fill(1, 25, 18, 25);
   fill(1, 27, 6, 29); fill(8, 27, 13, 29); fill(15, 27, 18, 29); fill(1, 31, 18, 31);
   fill(1, 33, 12, 35); fill(14, 33, 18, 35); fill(8, 36, 9, 37); fill(6, 38, 12, 39); fill(1, 39, 18, 39);
   fill(1, 40, 11, 43); fill(13, 40, 18, 43); fill(1, 45, 18, 45);
   fill(1, 47, 8, 49); fill(10, 47, 14, 49); fill(16, 47, 18, 49);
   for (const [c, r] of PORTAS) mark(c, r, 1);
-  const BLOQUEIOS = [[7, 1], [8, 1], [9, 1], [10, 1], [8, 0], [9, 0], [12, 14], [13, 14], [11, 15], [17, 15], [18, 15], [16, 15], [18, 14], [1, 9], [11, 9], [18, 7], [1, 13], [4, 15], [6, 13], [3, 21], [4, 21], [5, 21], [4, 22], [5, 22], [6, 40], [7, 40]];
+  const BLOQUEIOS = [[7, 1], [8, 1], [9, 1], [10, 1], [8, 0], [9, 0], [12, 13], [13, 13], [11, 14], [17, 14], [18, 14], [16, 14], [18, 13], [1, 8], [11, 8], [18, 6], [1, 12], [4, 14], [6, 12], [3, 21], [4, 21], [5, 21], [4, 22], [5, 22], [6, 40], [7, 40]];
   for (const a of RAW) if (a.desk) BLOQUEIOS.push(a.desk);
   for (const [c, r] of BLOQUEIOS) mark(c, r, 0);
 
@@ -429,22 +429,26 @@
     dpr = Math.min(viewW < 720 ? 1.5 : 2, devicePixelRatio || 1);
     cvs.width = Math.round(viewW * dpr); cvs.height = Math.round(viewH * dpr);
   }
-  // Zoom 1 = Diretoria + fileira vizinha (~11.5 rows). Fundo do palco = piso (sem preto).
+  // Zoom 1 = Diretoria inteira + fileira vizinha, com margem (cabe em ~1024px).
   function escalaCasa() {
-    return Math.min(viewW / (COLS * TILE), viewH / (11.5 * TILE));
+    // c 0.3..19.7 e r -0.05..9.4 → logos não encostam; corredor norte mais curto
+    const bw = 19.4 * TILE, bh = 9.5 * TILE;
+    return Math.min(viewW / bw, viewH / bh) * 0.97;
   }
   function camera() {
     const s = escalaCasa() * zoomUser;
     let ox, oy;
     if (seguir) {
-      ox = (viewW - COLS * TILE * s) / 2;
-      // ancora o topo do mapa (r=0) perto do topo da tela
-      oy = 8;
-      // se o jogador descer, acompanha mantendo-o no terço superior
-      const follow = viewH * 0.34 - player.r * TILE * s;
+      const cx = 10; // centro horizontal do escritório
+      ox = viewW / 2 - cx * TILE * s;
+      oy = 10; // topo do mapa com folga
+      const follow = viewH * 0.32 - player.r * TILE * s;
       if (follow < oy) oy = follow;
-      const minOy = viewH - ROWS * TILE * s;
-      oy = Math.min(8, Math.max(minOy, oy));
+      const mapW = COLS * TILE * s, mapH = ROWS * TILE * s;
+      if (mapW <= viewW) ox = (viewW - mapW) / 2;
+      else ox = Math.min(0, Math.max(viewW - mapW, ox));
+      const minOy = viewH - mapH;
+      oy = Math.min(10, Math.max(minOy, oy));
     } else {
       let cx = COLS / 2, cy = ROWS / 2;
       if (focusId) {
@@ -460,7 +464,7 @@
       if (mapW <= viewW) ox = (viewW - mapW) / 2;
       else ox = Math.min(0, Math.max(viewW - mapW, ox));
       if (mapH <= viewH) oy = (viewH - mapH) / 2;
-      else oy = Math.min(8, Math.max(viewH - mapH, oy));
+      else oy = Math.min(10, Math.max(viewH - mapH, oy));
     }
     cam = { s, ox, oy };
   }
@@ -580,24 +584,27 @@
     px(x, y, TILE - 4, 22, '#c9955a');
     px(x + 1, y + 1, TILE - 6, 4, '#e6c48a');
     px(x + 2, y + 18, TILE - 8, 3, '#8a6238');
-    // laptop aberto
-    px(x + 11, y + 8, 18, 3, '#11141c');
-    px(x + 12, y + 2, 16, 10, '#1b1e28');
-    px(x + 14, y + 3, 12, 7, a.presenca === 'foco' ? '#5cf0ff' : '#4a90c8');
+    // laptop aberto (compacto, deixa faixa p/ plaquinha)
+    px(x + 12, y + 7, 16, 2, '#11141c');
+    px(x + 13, y + 2, 14, 8, '#1b1e28');
+    px(x + 15, y + 3, 10, 5, a.presenca === 'foco' ? '#5cf0ff' : '#4a90c8');
+    // plaquinha no tampo — nome completo, largura pelo texto
+    if (!a.ceo && !a.bot) {
+      const nome = a.name;
+      const size = nome.length > 11 ? 5 : nome.length > 9 ? 5.5 : 6;
+      ctx.font = `700 ${size}px system-ui,sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      const tw = Math.ceil(ctx.measureText(nome).width) + 8;
+      const px0 = x + (TILE - 4 - tw) / 2;
+      const py0 = y + 12;
+      px(px0, py0, tw, 8, '#fff8ea');
+      ctx.strokeStyle = 'rgba(60,40,20,.3)'; ctx.lineWidth = 1;
+      ctx.strokeRect(px0 + 0.5, py0 + 0.5, tw - 1, 7);
+      ctx.fillStyle = '#2e2418';
+      ctx.fillText(nome, px0 + tw / 2, py0 + 4.5);
+    }
     // cadeira à frente
     drawChair(x + 11, y + 26);
-    // plaquinha só se o agente não está em cima da mesa (evita colidir com o nome)
-    const pertoMesa = Math.hypot(a.c - (c + 0.5), a.r - (r + 0.9)) < 1.35;
-    if (!a.ceo && !a.bot && !pertoMesa) {
-      const nome = a.name.length > 8 ? a.name.slice(0, 7) + '…' : a.name;
-      ctx.font = '600 7px system-ui,sans-serif';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      const tw = Math.min(TILE - 12, ctx.measureText(nome).width + 5);
-      const px0 = x + (TILE - 4 - tw) / 2, py0 = y + 20;
-      px(px0, py0, tw, 8, '#fff8ea');
-      ctx.fillStyle = '#4a3a28';
-      ctx.fillText(nome, x + (TILE - 4) / 2, py0 + 4);
-    }
   }
   function drawRoomDecor() {
     for (const rm of ROOMS) {
@@ -621,70 +628,53 @@
   }
   function drawCozinha() {
     // bancada contínua
-    px(worldX(11.15), worldY(13.12), 3.65 * TILE, 0.62 * TILE, '#ebe4d6');
-    px(worldX(11.15), worldY(13.12), 3.65 * TILE, 5, '#f7f2e8');
+    px(worldX(11.15), worldY(12.12), 3.65 * TILE, 0.62 * TILE, '#ebe4d6');
+    px(worldX(11.15), worldY(12.12), 3.65 * TILE, 5, '#f7f2e8');
     // pia
-    px(worldX(11.3), worldY(13.22), 0.8 * TILE, 0.42 * TILE, '#9eb0c2');
-    px(worldX(11.42), worldY(13.3), 0.55 * TILE, 0.26 * TILE, '#7f93a8');
-    px(worldX(11.55), worldY(13.18), 4, 8, '#c0c8d0'); // torneira
+    px(worldX(11.3), worldY(12.22), 0.8 * TILE, 0.42 * TILE, '#9eb0c2');
+    px(worldX(11.42), worldY(12.3), 0.55 * TILE, 0.26 * TILE, '#7f93a8');
+    px(worldX(11.55), worldY(12.18), 4, 8, '#c0c8d0'); // torneira
     // cafeteira
-    px(worldX(12.25), worldY(13.2), 0.55 * TILE, 0.45 * TILE, '#3e2a20');
-    px(worldX(12.32), worldY(13.12), 0.4 * TILE, 0.14 * TILE, '#1e1410');
+    px(worldX(12.25), worldY(12.2), 0.55 * TILE, 0.45 * TILE, '#3e2a20');
+    px(worldX(12.32), worldY(12.12), 0.4 * TILE, 0.14 * TILE, '#1e1410');
     ctx.fillStyle = '#7a4030';
-    ctx.beginPath(); ctx.ellipse(worldX(12.52), worldY(13.48), 6, 3.5, 0, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(worldX(12.52), worldY(12.48), 6, 3.5, 0, 0, 7); ctx.fill();
     // geladeira alta (bem legível)
-    px(worldX(13.9), worldY(13.05), 1.0 * TILE, 1.2 * TILE, '#dfe8f0');
-    px(worldX(13.9), worldY(13.05), 1.0 * TILE, 4, '#f2f6fa');
-    px(worldX(14.0), worldY(13.2), 0.8 * TILE, 0.4 * TILE, '#c5d0dc');
-    px(worldX(14.0), worldY(13.7), 0.8 * TILE, 0.45 * TILE, '#c5d0dc');
-    px(worldX(14.75), worldY(13.45), 6, 16, '#7f8f9f');
-    px(worldX(14.05), worldY(13.35), 8, 3, '#9aabba');
-    px(worldX(14.05), worldY(13.85), 8, 3, '#9aabba');
+    px(worldX(13.9), worldY(12.05), 1.0 * TILE, 1.2 * TILE, '#dfe8f0');
+    px(worldX(13.9), worldY(12.05), 1.0 * TILE, 4, '#f2f6fa');
+    px(worldX(14.0), worldY(12.2), 0.8 * TILE, 0.4 * TILE, '#c5d0dc');
+    px(worldX(14.0), worldY(12.7), 0.8 * TILE, 0.45 * TILE, '#c5d0dc');
+    px(worldX(14.75), worldY(12.45), 6, 16, '#7f8f9f');
+    px(worldX(14.05), worldY(12.35), 8, 3, '#9aabba');
+    px(worldX(14.05), worldY(12.85), 8, 3, '#9aabba');
     // mesa café + cadeiras
-    px(worldX(11.25), worldY(14.55), 1.55 * TILE, 1.05 * TILE, '#d7b07a');
-    drawChair(worldX(11.4), worldY(15.55));
-    drawChair(worldX(12.2), worldY(15.55));
-    drawChair(worldX(11.4), worldY(14.25));
+    px(worldX(11.25), worldY(13.55), 1.55 * TILE, 1.05 * TILE, '#d7b07a');
+    drawChair(worldX(11.4), worldY(14.55));
+    drawChair(worldX(12.2), worldY(14.55));
+    drawChair(worldX(11.4), worldY(13.25));
     // mesa de reunião grande com 6 cadeiras
-    px(worldX(12.95), worldY(14.4), 2.05 * TILE, 1.45 * TILE, '#b89560');
-    px(worldX(13.1), worldY(14.55), 1.75 * TILE, 1.15 * TILE, '#e6d4b4');
+    px(worldX(12.95), worldY(13.4), 2.05 * TILE, 1.45 * TILE, '#b89560');
+    px(worldX(13.1), worldY(13.55), 1.75 * TILE, 1.15 * TILE, '#e6d4b4');
     ctx.strokeStyle = '#7a5a30'; ctx.lineWidth = 2;
-    ctx.strokeRect(worldX(12.95) + 1, worldY(14.4) + 1, 2.05 * TILE - 2, 1.45 * TILE - 2);
-    [[12.75, 14.55], [13.55, 14.55], [14.35, 14.55], [12.75, 15.5], [13.55, 15.5], [14.35, 15.5]].forEach(([c, r]) => {
+    ctx.strokeRect(worldX(12.95) + 1, worldY(13.4) + 1, 2.05 * TILE - 2, 1.45 * TILE - 2);
+    [[12.75, 13.55], [13.55, 13.55], [14.35, 13.55], [12.75, 14.5], [13.55, 14.5], [14.35, 14.5]].forEach(([c, r]) => {
       drawChair(worldX(c), worldY(r));
     });
   }
   function drawLounge() {
-    px(worldX(16.25), worldY(14.55), 1.45 * TILE, 0.7 * TILE, '#f4efe4');
-    px(worldX(16.25), worldY(14.55), 1.45 * TILE, 0.18 * TILE, '#fff8ee');
-    px(worldX(17.35), worldY(13.35), 1.15 * TILE, 0.7 * TILE, '#f4efe4');
-    px(worldX(17.0), worldY(14.15), 0.7 * TILE, 0.5 * TILE, '#c4a15a');
-    px(worldX(18.0), worldY(14.65), 0.7 * TILE, 0.75 * TILE, '#2a4a8a');
-    px(worldX(18.1), worldY(14.75), 0.5 * TILE, 0.35 * TILE, !reduce && Math.sin(t / 280) > 0 ? '#5cf0ff' : '#243040');
+    px(worldX(16.25), worldY(13.55), 1.45 * TILE, 0.7 * TILE, '#f4efe4');
+    px(worldX(16.25), worldY(13.55), 1.45 * TILE, 0.18 * TILE, '#fff8ee');
+    px(worldX(17.35), worldY(12.35), 1.15 * TILE, 0.7 * TILE, '#f4efe4');
+    px(worldX(17.0), worldY(13.15), 0.7 * TILE, 0.5 * TILE, '#c4a15a');
+    px(worldX(18.0), worldY(13.65), 0.7 * TILE, 0.75 * TILE, '#2a4a8a');
+    px(worldX(18.1), worldY(13.75), 0.5 * TILE, 0.35 * TILE, !reduce && Math.sin(t / 280) > 0 ? '#5cf0ff' : '#243040');
   }
   function drawDiretoria() {
-    // mesa executiva
-    px(worldX(6.4), worldY(1.15), 3.8 * TILE, 1.0 * TILE, '#e8d7b8');
-    px(worldX(6.55), worldY(1.25), 3.5 * TILE, 0.8 * TILE, '#f3efe4');
-    // PC no norte da mesa — rótulo acima da tela
-    const pcX = worldX(7.95), pcY = worldY(1.25);
-    px(pcX, pcY, 0.9 * TILE, 0.7 * TILE, '#1b1e28');
-    px(pcX + 6, pcY + 6, 0.6 * TILE, 0.42 * TILE, '#3ddc97');
-    ctx.font = '700 8px system-ui,sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    const sshW = 78;
-    px(pcX - 2, pcY - 15, sshW, 12, 'rgba(8,10,16,.92)');
-    ctx.strokeStyle = '#3ddc97'; ctx.lineWidth = 1.2;
-    ctx.strokeRect(pcX - 2, pcY - 15, sshW, 12);
-    ctx.fillStyle = '#d7f5b0';
-    ctx.fillText('SSH · em breve', pcX - 2 + sshW / 2, pcY - 9);
-    hits.push({ tipo: 'pc', c: 8.35, r: 1.6, rad: 0.9 });
-
-    // logos: três quadros iguais, bem dentro da parede norte
-    const f = 72, g = 48, fh = 38;
+    // logos primeiro (faixa norte), depois mesa/PC abaixo — evita tapar o SSH
+    const f = 64, g = 36, fh = 34;
     const t3 = f * 3 + g * 2;
-    const x0 = worldX(1.6) + ((16.8 * TILE) - t3) / 2;
-    const y0 = worldY(0.7);
+    const x0 = worldX(2.0) + ((15.5 * TILE) - t3) / 2;
+    const y0 = worldY(0.45);
     const slots = [
       { img: MARCAS.observait, fallback: 'DM ObservaIT' },
       { img: MARCAS.wear, fallback: 'Dynamo Wear' },
@@ -706,7 +696,27 @@
         ctx.fillText(s.fallback, x + f / 2, y0 + fh / 2);
       }
     });
-    // sem janelas na parede dos logos — só plantas nos cantos
+
+    // mesa executiva abaixo dos quadros
+    px(worldX(6.4), worldY(1.55), 3.8 * TILE, 1.0 * TILE, '#e8d7b8');
+    px(worldX(6.55), worldY(1.65), 3.5 * TILE, 0.8 * TILE, '#f3efe4');
+    const pcX = worldX(7.95), pcY = worldY(1.65);
+    px(pcX, pcY, 0.9 * TILE, 0.7 * TILE, '#1b1e28');
+    px(pcX + 6, pcY + 6, 0.6 * TILE, 0.42 * TILE, '#3ddc97');
+    // etiqueta SSH completa, medida pelo texto
+    const sshLbl = 'SSH · em breve';
+    ctx.font = '700 8px system-ui,sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const sshW = Math.ceil(ctx.measureText(sshLbl).width) + 14;
+    const sshX = pcX + (0.9 * TILE - sshW) / 2;
+    const sshY = pcY - 14;
+    px(sshX, sshY, sshW, 12, 'rgba(8,10,16,.92)');
+    ctx.strokeStyle = '#3ddc97'; ctx.lineWidth = 1.2;
+    ctx.strokeRect(sshX, sshY, sshW, 12);
+    ctx.fillStyle = '#d7f5b0';
+    ctx.fillText(sshLbl, sshX + sshW / 2, sshY + 6);
+    hits.push({ tipo: 'pc', c: 8.35, r: 1.85, rad: 0.9 });
+
     drawPlant(17.4, 3.1);
     drawPlant(1.2, 3.1);
   }
@@ -795,9 +805,36 @@
     }
     hits.push({ a, c: a.c, r: a.r, rad: 0.8 });
   }
+  function drawBebedouro(c, r) {
+    const x = worldX(c) + 8, y = worldY(r) + 4;
+    px(x, y + 10, 20, 22, '#c5d4e0');
+    px(x + 4, y, 12, 14, '#8ec8e8');
+    px(x + 6, y + 2, 8, 8, 'rgba(255,255,255,.35)');
+    px(x + 8, y + 28, 6, 6, '#6a7a88');
+  }
+  function drawSofaCorredor(c, r) {
+    const x = worldX(c), y = worldY(r) + 4;
+    px(x, y, 1.7 * TILE, 0.62 * TILE, '#6e5540');
+    px(x + 2, y + 2, 1.6 * TILE, 0.42 * TILE, '#8a6a4e');
+    px(x + 4, y, 1.5 * TILE, 0.14 * TILE, '#a88460');
+    px(x + 6, y + 10, 1.4 * TILE, 0.28 * TILE, '#5a4332');
+  }
+  function drawCorredorNorte() {
+    // Faixa curta entre Diretoria (r0-3) e fileira de baixo (r6): sofá, bebedouro, plantas
+    ctx.fillStyle = 'rgba(120, 90, 50, .16)';
+    ctx.fillRect(worldX(2.5), worldY(4.15), 14 * TILE, 0.85 * TILE);
+    drawSofaCorredor(2.0, 4.05);
+    drawSofaCorredor(15.8, 4.05);
+    drawBebedouro(9.2, 3.95);
+    drawPlant(5.0, 4.1);
+    drawPlant(7.0, 4.2);
+    drawPlant(11.6, 4.1);
+    drawPlant(13.6, 4.2);
+  }
   function drawFurniture() {
     drawRoomDecor();
     drawDiretoria();
+    drawCorredorNorte();
     drawCozinha();
     drawLounge();
     for (const a of agents) if (a.desk) drawDesk(a);
@@ -859,7 +896,6 @@
         ctx.globalAlpha = 1;
       } else drawAvatar(a, nameSlots);
     }
-
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     drawMiniMap();
     desenharEuFace();
@@ -1248,6 +1284,14 @@
     },
     proximo: () => proxAgente,
     acenar: () => acenar(proxAgente),
-    avancar: (ms) => { const n = Math.min(8000, ms / PASSO); for (let i = 0; i < n; i++) update(PASSO); }
+    avancar: (ms) => { const n = Math.min(8000, ms / PASSO); for (let i = 0; i < n; i++) update(PASSO); },
+    nudgeDesks: (roomId) => {
+      for (const a of agents) {
+        if (roomId && a.roomId !== roomId) continue;
+        if (!a.desk || a.ceo) continue;
+        // ao lado sul da mesa, sem tapar a plaquinha do tampo
+        a.c = a.desk[0] + 0.5; a.r = a.desk[1] + 1.65; a.caminho = null;
+      }
+    }
   };
 })();

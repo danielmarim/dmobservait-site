@@ -773,7 +773,7 @@
     ctx.fillStyle = '#d7f5b0';
     ctx.fillText('SSH · em breve', p.x, p.y + 25);
     ctx.restore();
-    drawLogoWall();
+    // Logos de parede saem depois do clip da sala (senão a altura some no recorte do piso).
     drawQuadro(1.15, 1.2);
     drawPlant(16.8, 0.6);
     drawPlant(17.5, 2.8);
@@ -1099,7 +1099,7 @@
     const feet = project(a.c, a.r, 0);
     const s = toScreen(feet.x, feet.y - 122 - (a.altoRobo ? 36 : 0));
     ctx.font = '700 12px system-ui,sans-serif';
-    const texto = tipo === 'aviso' ? 'aviso' : 'Falar';
+    const texto = tipo === 'aviso' ? 'aviso' : 'Chat';
     const w = ctx.measureText(texto).width + 28;
     const x = s.x - w / 2, y = s.y - 12;
     rr(x, y, w, 22, 8, '#fffdf6', '#1b1f2e');
@@ -1200,6 +1200,7 @@
       }
     }
     if (rmFocus) ctx.restore();
+    if (vista[0] < 8) drawLogoWall();
     for (const a of agents) if (visivel(a)) {
       const feet = project(a.c, a.r, 0);
       const s = toScreen(feet.x, feet.y - 20);

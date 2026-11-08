@@ -148,6 +148,7 @@
 
   // O robô verde é só o Dyno AI. O Dyno Bot (CTO) continua o holograma com coroa.
   const ROBOS = {
+    Daniel: { cor: '#e2c27a', base: '/workai/assets/avatares/daniel', alto: 102 },
     'Dyno AI': { cor: '#3ddc97', base: '/workai/assets/avatares/dyno', alto: 98 },
     Dina: { cor: '#ff4fa3', base: '/workai/assets/avatares/dina', alto: 90 }
   };
@@ -678,13 +679,14 @@
     const larg = alto * (img.naturalWidth / img.naturalHeight);
     ctx.save();
     ctx.translate(feet.x, feet.y);
-    ellipse(0, 3, a.destaque ? 20 : 16, 7, 'rgba(0,0,0,.32)');
+    const marca = a.destaque || a.ceo;
+    ellipse(0, 3, marca ? 20 : 16, 7, 'rgba(0,0,0,.32)');
     if (!reduce) {
       ctx.strokeStyle = a.corRobo;
       ctx.globalAlpha = 0.95;
-      ctx.lineWidth = a.destaque ? 2.6 : 2;
+      ctx.lineWidth = marca ? 2.6 : 2;
       ctx.beginPath();
-      ctx.ellipse(0, 3, a.destaque ? 22 : 17, 8, 0, 0, 7);
+      ctx.ellipse(0, 3, marca ? 22 : 17, 8, 0, 0, 7);
       ctx.stroke();
       ctx.globalAlpha = 1;
     }
@@ -833,7 +835,7 @@
       }
       hits.push({ a, x: s.x, y: y + 36, r: 36 });
       if (a.ceo) {
-        const seta = toScreen(feet.x, feet.y - 108);
+        const seta = toScreen(feet.x, feet.y - (a.altoRobo ? a.altoRobo + 40 : 108));
         const bob = reduce ? 0 : Math.sin(t / 280) * 3;
         ctx.strokeStyle = '#f0d78c'; ctx.lineWidth = 2.4; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
         ctx.beginPath(); ctx.moveTo(seta.x - 8, seta.y + bob); ctx.lineTo(seta.x, seta.y + 9 + bob); ctx.lineTo(seta.x + 8, seta.y + bob); ctx.stroke();
@@ -1146,7 +1148,7 @@
       else if (agente) el.addEventListener('click', () => abrir(agente, el.getBoundingClientRect()));
       arvore.append(el);
     };
-    linha('n0', nomeCeo() + ' (CEO)', null, () => { seguir = true; focusId = ''; syncChips(); abrir(player, { x: 80, y: 120 }); });
+    linha('n0', nomeCeo() + ' (CEO)', player, () => { seguir = true; focusId = ''; syncChips(); abrir(player, { x: 80, y: 120 }); });
     linha('n1', 'Dyno Bot · CTO · gerente', achar('Dyno Bot'));
     linha('n2', 'Recap AI', achar('Recap AI'));
     for (const rm of ROOMS) {
@@ -1224,7 +1226,7 @@
       abrir(a, { x: x == null ? 640 : x, y: y == null ? 120 : y });
       return document.getElementById('card-corpo').textContent;
     },
-    robosProntos: () => ['Dyno AI', 'Dina'].every((n) => {
+    robosProntos: () => ['Daniel', 'Dyno AI', 'Dina'].every((n) => {
       const a = achar(n);
       return !!(a && spriteRobo(a));
     }),

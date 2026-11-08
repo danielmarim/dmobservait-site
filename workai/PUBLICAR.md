@@ -70,10 +70,18 @@ Conferir, sem cookie:
 - a página de login é a mesma do painel
 - `/workai/workai.js` sem sessão → 401
 - `/workai/assets/avatares/*.webp` sem sessão → 401 (o Daniel, a Dyna 2.0 e os robôs oficiais do Dyno AI e da Dina)
+- `/workai/assets/marcas/*` sem sessão → 401 (logos de parede do escritório)
 - `/workai/assets/observait-logo.png` responde sem sessão: o selo “Powered by” da tela de login. O `default.conf` libera só esse arquivo; o resto de `/workai/` no site público continua 404.
 
 Com a sessão criada nessa origem, `/` mostra o escritório. `Sair` posta em
 `/admin/auth/sair` e volta para `/admin/login`.
+
+## Propostas (ainda não ligadas)
+
+- `workai/CHAT-PROPOSTA.md` — ponte autenticada para conversar com agentes reais (aprovação item a item; sem chave no front).
+- `workai/SSH-PROPOSTA.md` — terminal no PC da Diretoria via bridge no servidor.
+
+Nesta rodada o chat do mapa só usa `localStorage` e o painel SSH é informativo.
 
 ## Preview local
 

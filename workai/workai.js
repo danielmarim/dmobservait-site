@@ -81,7 +81,7 @@
     { room: 'brev', name: 'Partner AI', role: 'em breve', breve: true, sit: 'Em breve', cuida: 'Ainda sem função publicada.', nunca: 'Ainda não atua.', c: 15.5, r: 34.35 },
     { room: 'brev', name: 'Ads AI', role: 'em breve', breve: true, sit: 'Em breve', cuida: 'Ainda sem função publicada.', nunca: 'Ainda não atua.', c: 17.5, r: 34.35 },
     { room: 'brev', name: 'Guard AI', role: 'em breve', breve: true, sit: 'Em breve', cuida: 'Ainda sem função publicada.', nunca: 'Ainda não atua.', c: 16.5, r: 35.35 },
-    { room: 'marca', name: 'Dyna 2.0', role: 'agente-chefe da Dynamo Wear', chefe: true, tom: '#ff7a1a', sit: 'Em teste', cuida: 'A venda com teto de desconto, o checkout, a aprovação de afiliado, o cupom de parceiro e a qualificação do lead. Em teste, fala só com o time.', nunca: 'Amplia o teste antes de fechar a conversa e a verificação do webhook. Não dá desconto fora da regra. Não fala com cliente enquanto o teste não abrir.', c: 5.5, r: 42.35 },
+    { room: 'marca', name: 'Dyna 2.0', role: 'agente-chefe da Dynamo Wear', chefe: true, tom: '#ff7a1a', sit: 'Em teste', cuida: 'A venda com teto de desconto, o checkout, a aprovação de afiliado, o cupom de parceiro e a qualificação do lead. Em teste, fala só com o time.', nunca: 'Amplia o teste antes de fechar a conversa e a verificação do webhook. Não dá desconto fora da regra. Não fala com cliente enquanto o teste não abrir.', desk: [5, 40], c: 5.5, r: 41.4 },
     { room: 'marca', name: 'Funil Vendas', papel: 'Vendas no WhatsApp', role: 'venda no WhatsApp', sit: 'No ar', cuida: 'A venda no WhatsApp: funil por etapas, catálogo, checkout, cupom de primeira compra e a retomada de quem parou.', nunca: 'Transfere para uma pessoa sem resumo. Não cria cupom fora da primeira compra.', desk: [2, 40], c: 2.5, r: 41.4 },
     { room: 'marca', name: 'Dyna Grupos', papel: 'Grupos', role: 'grupos de creators e sócios', sit: 'Ativo, sem uso', cuida: 'Comandos nos grupos de creators e sócios.', nunca: 'Atende cliente no privado. Não registra uso que não houve.', desk: [9, 40], c: 9.5, r: 41.4 },
     { room: 'wped', name: 'Afiliados e Creators', papel: 'Portal', role: 'portal do afiliado', sit: 'No ar', cuida: 'O cadastro, a aprovação, a meta de conteúdo e o voucher que a meta gera.', nunca: 'Aprova sem o OK previsto. Não cita creator nem mostra entrega real.', desk: [14, 40], c: 15.5, r: 41.4 },
@@ -192,6 +192,13 @@
     a.sprite512 = carregarImg(r.base + '-512.webp');
     a.sprite256 = carregarImg(r.base + '-256.webp');
   }
+  // Logos oficiais na parede da Diretoria (repos/sites do Daniel; sem inventar marca).
+  const MARCAS = {
+    observait: carregarImg('/workai/assets/marcas/observait-logo.png'),
+    wear: carregarImg('/workai/assets/marcas/dynamo-wear-logo.svg'),
+    dyno: carregarImg('/workai/assets/marcas/dyno-mark.png')
+  };
+  const logoPronta = (img) => !!(img && img.complete && img.naturalWidth);
 
   const player = agents.find((a) => a.ceo);
   const achar = (id) => {
@@ -216,6 +223,8 @@
   const ctx = cvs.getContext('2d');
   const palco = document.getElementById('palco');
   let viewW = 1, viewH = 1, dpr = 1, focusId = '', t = 0, cam = { s: 1, ox: 0, oy: 0 };
+  let zoomUser = 1;
+  const ZOOM_MIN = 0.55, ZOOM_MAX = 2.4;
   let mouse = null, hover = null, ready = false, seguir = true, congelado = false, demoEm = 12000, fluxos = false;
   let vista = [0, ROWS - 1];
   const keys = new Set();
@@ -612,20 +621,27 @@
     const [r0, r1] = vista;
     for (let r = r0; r <= r1; r++) for (let c = 0; c < COLS; c++) if (W[at(c, r)]) {
       const zona = r >= 38 ? 'wear' : (r >= 36 ? 'ponte' : 'casa');
-      const cor = zona === 'wear' ? ((c + r) % 2 ? '#121214' : '#1a1a1d') : zona === 'ponte' ? ((c + r) % 2 ? '#2a2118' : '#3a2c1e') : ((c + r) % 2 ? '#171a22' : '#1c1f29');
+      // Casa: ripas de madeira claras (referência). Wear e ponte mantêm o contraste de marca.
+      const cor = zona === 'wear' ? ((c + r) % 2 ? '#121214' : '#1a1a1d') : zona === 'ponte' ? ((c + r) % 2 ? '#2a2118' : '#3a2c1e') : ((c + r) % 2 ? '#d8c3a0' : '#c9ae86');
       tile(c, r, cor);
     }
     for (const rm of ROOMS) {
       if (rm.r + rm.h < r0 || rm.r > r1) continue;
       ctx.save();
       if (rm.breve) ctx.globalAlpha = 0.42;
-      quad(project(rm.c, rm.r), project(rm.c + rm.w, rm.r), project(rm.c + rm.w, rm.r + rm.h), project(rm.c, rm.r + rm.h), rm.piso || (rm.col + (rm.glass ? '99' : '66')));
+      const pisoSala = rm.piso || (rm.ala === 'wear' ? null : (rm.col + (rm.glass ? '55' : '44')));
+      if (pisoSala) quad(project(rm.c, rm.r), project(rm.c + rm.w, rm.r), project(rm.c + rm.w, rm.r + rm.h), project(rm.c, rm.r + rm.h), pisoSala);
+      // Tapete suave no centro da sala.
+      if (rm.ala !== 'wear' && !rm.breve && rm.w >= 3 && rm.h >= 2) {
+        const m = 0.45;
+        quad(project(rm.c + m, rm.r + m), project(rm.c + rm.w - m, rm.r + m), project(rm.c + rm.w - m, rm.r + rm.h - m), project(rm.c + m, rm.r + rm.h - m), 'rgba(255,255,255,.16)');
+      }
       ctx.beginPath();
       const a = project(rm.c, rm.r), b = project(rm.c + rm.w, rm.r), c = project(rm.c + rm.w, rm.r + rm.h), d = project(rm.c, rm.r + rm.h);
       ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.lineTo(c.x, c.y); ctx.lineTo(d.x, d.y); ctx.closePath();
       ctx.strokeStyle = rm.ala === 'wear' ? '#ff7a1a' : rm.id === 'odyn' ? '#d7f5b0' : rm.col;
-      ctx.globalAlpha = rm.breve ? 0.45 : rm.glass ? 0.95 : 0.55;
-      ctx.lineWidth = rm.ala === 'wear' || rm.id === 'odyn' ? 3.2 : rm.glass ? 2.4 : 1.5;
+      ctx.globalAlpha = rm.breve ? 0.45 : rm.glass ? 0.95 : 0.7;
+      ctx.lineWidth = rm.ala === 'wear' || rm.id === 'odyn' ? 3.2 : rm.glass ? 2.4 : 1.7;
       ctx.stroke();
       ctx.restore();
     }
@@ -653,12 +669,57 @@
     g.addColorStop(0, color); g.addColorStop(1, 'transparent');
     ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(p.x, p.y, rad, rad * 0.5, 0, 0, 7); ctx.fill();
   }
+  function drawChair(c, r) {
+    box(c, r, 0.42, 0.42, 9, '#5c4636', '#3e2e24', '#2a1e18');
+    box(c + 0.04, r + 0.04, 0.34, 0.14, 18, '#7a5a42', '#5c4636', '#3e2e24');
+  }
+  function drawPlaqueta(c, r, nome, col) {
+    const p = project(c + 0.46, r + 0.7, 18);
+    const rotulo = String(nome || '').slice(0, 18);
+    ctx.save();
+    ctx.font = '700 8px system-ui,sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const w = Math.min(78, ctx.measureText(rotulo).width + 10);
+    rr(p.x - w / 2, p.y - 7, w, 14, 4, 'rgba(255,253,246,.92)', col || '#1b1f2e');
+    ctx.fillStyle = '#1b1f2e';
+    ctx.fillText(rotulo, p.x, p.y);
+    ctx.restore();
+  }
   function drawDesk(a) {
     const c = a.desk[0], r = a.desk[1];
-    box(c, r, 0.92, 0.58, 14, '#c49a6a', '#8a5a38', '#5c3b28');
-    box(c + 0.22, r + 0.06, 0.36, 0.1, 26, '#1b1e28', '#12151c', '#0c0e14');
+    // cadeira na frente da mesa
+    drawChair(c + 0.25, r + 0.72);
+    box(c, r, 0.95, 0.62, 15, '#d7b07a', '#a67948', '#6e4a2c');
+    // laptop
+    box(c + 0.28, r + 0.12, 0.38, 0.12, 22, '#1b1e28', '#12151c', '#0c0e14');
     const on = a.status === 'digitando' || (!reduce && Math.sin(t / 400 + a.ph) > -0.2);
-    quad(project(c + 0.26, r + 0.08, 24), project(c + 0.54, r + 0.08, 24), project(c + 0.54, r + 0.08, 16), project(c + 0.26, r + 0.08, 16), on ? a.room.col + 'cc' : '#243040');
+    quad(project(c + 0.3, r + 0.14, 30), project(c + 0.62, r + 0.14, 30), project(c + 0.62, r + 0.14, 20), project(c + 0.3, r + 0.14, 20), on ? (a.room.col + 'cc') : '#243040');
+    drawPlaqueta(c, r, a.name, a.room.col);
+  }
+  function drawRoomName(rm) {
+    if (!rm || rm.breve) return;
+    const p = project(rm.c + rm.w / 2, rm.r + 0.55, 2);
+    const texto = rm.short || rm.name;
+    ctx.save();
+    ctx.font = '800 11px system-ui,sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const w = ctx.measureText(texto).width + 14;
+    rr(p.x - w / 2, p.y - 8, w, 16, 5, 'rgba(12,14,20,.72)', rm.col);
+    ctx.fillStyle = '#fff';
+    ctx.fillText(texto, p.x, p.y);
+    ctx.restore();
+  }
+  function drawQuadro(c, r) {
+    box(c, r, 0.18, 1.1, 34, '#f4f0e6', '#d9d0c0', '#b7ad9c');
+    const p = project(c + 0.08, r + 0.55, 28);
+    ctx.fillStyle = '#1b1f2e';
+    ctx.fillRect(p.x - 2, p.y - 18, 4, 28);
+  }
+  function drawFliperama(c, r) {
+    box(c, r, 0.7, 0.55, 28, '#2a4a8a', '#1a2e5c', '#101c3a');
+    box(c + 0.1, r + 0.1, 0.5, 0.18, 36, '#0e1016', '#080a10', '#040508');
+    const on = !reduce && Math.sin(t / 280) > 0;
+    quad(project(c + 0.14, r + 0.12, 34), project(c + 0.56, r + 0.12, 34), project(c + 0.56, r + 0.12, 28), project(c + 0.14, r + 0.12, 28), on ? '#5cf0ff' : '#243040');
   }
   function drawPlant(c, r) {
     box(c, r, 0.34, 0.34, 7, '#a8643e', '#7a4528', '#5a321c');
@@ -671,25 +732,74 @@
     box(c, r, len, 0.7, 11, cloth, shade(cloth, -30), shade(cloth, -50));
     box(c, r, len, 0.18, 22, shade(cloth, 20), shade(cloth, -10), shade(cloth, -30));
   }
+  let pcHit = null;
+  function drawLogoWall() {
+    // Pastilhas claras na parede norte da Diretoria.
+    const slots = [
+      { img: MARCAS.observait, c: 2.2, r: 0.15, w: 92, h: 28, fallback: 'DM ObservaIT' },
+      { img: MARCAS.wear, c: 8.2, r: 0.15, w: 100, h: 26, fallback: 'Dynamo Wear' },
+      { img: MARCAS.dyno, c: 14.4, r: 0.15, w: 34, h: 34, fallback: 'Dyno' }
+    ];
+    for (const s of slots) {
+      const p = project(s.c, s.r, 40);
+      ctx.save();
+      rr(p.x - s.w / 2 - 4, p.y - s.h / 2 - 4, s.w + 8, s.h + 8, 8, '#f4f7f2', 'rgba(0,0,0,.2)');
+      if (logoPronta(s.img)) ctx.drawImage(s.img, p.x - s.w / 2, p.y - s.h / 2, s.w, s.h);
+      else {
+        ctx.fillStyle = '#172d35';
+        ctx.font = '700 11px system-ui,sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(s.fallback, p.x, p.y);
+      }
+      ctx.restore();
+    }
+  }
   function drawMesaExec() {
-    box(6.15, 0.55, 4.3, 1.2, 16, '#f3efe4', '#d9d0c0', '#b7ad9c');
-    box(6.45, 0.85, 3.7, 0.62, 18, '#e2c27a', '#a6853f', '#6e5424');
+    // mesa executiva orgânica + PC destacado
+    box(5.9, 0.45, 4.6, 1.35, 16, '#e8d7b8', '#c4a878', '#8a6e48');
+    box(6.3, 0.7, 3.8, 0.85, 18, '#f3efe4', '#d9d0c0', '#b7ad9c');
+    drawChair(7.7, 2.0);
+    // computador clicável
+    box(7.55, 0.85, 0.7, 0.45, 34, '#1b1e28', '#12151c', '#0c0e14');
+    quad(project(7.62, 0.95, 42), project(8.15, 0.95, 42), project(8.15, 0.95, 28), project(7.62, 0.95, 28), '#3ddc97cc');
+    const p = project(7.9, 1.05, 36);
+    const s = toScreen(p.x, p.y);
+    pcHit = { x: s.x, y: s.y, r: 34 };
+    hits.push({ tipo: 'pc', x: s.x, y: s.y, r: 34 });
+    ctx.save();
+    ctx.font = '700 8px system-ui,sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    rr(p.x - 34, p.y + 18, 68, 14, 4, 'rgba(8,10,16,.82)', '#3ddc97');
+    ctx.fillStyle = '#d7f5b0';
+    ctx.fillText('SSH · em breve', p.x, p.y + 25);
+    ctx.restore();
+    // Logos de parede saem depois do clip da sala (senão a altura some no recorte do piso).
+    drawQuadro(1.15, 1.2);
+    drawPlant(16.8, 0.6);
+    drawPlant(17.5, 2.8);
   }
-  function drawMesaCopa() {
-    box(11.85, 13.85, 2.15, 1.05, 13, '#d7b07a', '#a67948', '#6e4a2c');
-    box(12.2, 14.05, 0.45, 0.28, 16, '#f4f0e6', '#d9d0c0', '#b7ad9c');
-  }
-  function drawCafe() {
-    box(11.05, 14.85, 0.85, 0.45, 16, '#5c4636', '#3e2e24', '#2a1e18');
-    const p = project(11.45, 15.05, 22);
+  function drawCozinha() {
+    // bancada + geladeira + pia + cafeteira + mesa com cadeiras
+    box(11.1, 13.15, 3.6, 0.55, 18, '#ece7dc', '#cfc7b8', '#a8a090');
+    box(11.2, 13.25, 0.7, 0.35, 28, '#cfd8e3', '#9aabbc', '#6e7f90'); // pia
+    box(13.7, 13.2, 0.85, 0.7, 34, '#dfe6ee', '#aeb8c4', '#7e8894'); // geladeira
+    box(12.2, 13.25, 0.55, 0.35, 24, '#5c4636', '#3e2e24', '#2a1e18'); // cafeteira
+    const p = project(12.45, 13.4, 28);
     ellipse(p.x, p.y, 4, 2.4, '#6b3a28', '#e2c27a');
+    box(12.0, 14.55, 2.0, 1.05, 14, '#d7b07a', '#a67948', '#6e4a2c');
+    drawChair(12.2, 15.55);
+    drawChair(13.1, 15.55);
+    drawPlant(14.5, 15.2);
   }
   function drawLounge() {
     const p = project(17.2, 14.2, 0);
     ctx.save(); ctx.translate(p.x, p.y); ctx.scale(1, 0.5);
     ctx.fillStyle = 'rgba(126,200,195,.35)'; ctx.beginPath(); ctx.ellipse(0, 0, 28, 28, 0, 0, 7); ctx.fill(); ctx.restore();
-    drawSofa(16.15, 14.85, 1.7, '#3d6f78');
-    box(18.05, 14.05, 0.7, 0.55, 8, '#c4a15a', '#8a6a30', '#5c451c');
+    drawSofa(16.15, 14.85, 1.55, '#f4efe4');
+    drawSofa(17.5, 13.35, 1.1, '#f4efe4');
+    box(17.0, 14.2, 0.7, 0.55, 8, '#c4a15a', '#8a6a30', '#5c451c');
+    drawFliperama(18.1, 14.85);
+    drawPlant(16.2, 13.2);
   }
   function drawGlass() {
     const rm = room('dir');
@@ -883,17 +993,37 @@
     dpr = Math.min(viewW < 720 ? 1.25 : 2, devicePixelRatio || 1);
     cvs.width = Math.round(viewW * dpr); cvs.height = Math.round(viewH * dpr);
   }
-  function camera() {
+  function cameraBase() {
     if (seguir) {
       const p = project(player.c, player.r, 0);
-      const z = viewW < 720 ? 1.62 : 2.05;
+      const z = (viewW < 720 ? 1.62 : 2.05) * zoomUser;
       const baixo = viewH < 360 ? 0.7 : 0.6;
-      cam = { s: z, ox: viewW / 2 - p.x * z, oy: viewH * baixo - p.y * z };
-      return;
+      return { s: z, ox: viewW / 2 - p.x * z, oy: viewH * baixo - p.y * z, cx: p.x, cy: p.y };
     }
     const b = boundsOf(focusId);
-    const s = Math.min((viewW - 12) / b.w, (viewH - 12) / b.h, focusId ? 2.05 : 4);
-    cam = { s, ox: (viewW - b.w * s) / 2 - b.x * s, oy: (viewH - b.h * s) / 2 - b.y * s };
+    const s0 = Math.min((viewW - 12) / b.w, (viewH - 12) / b.h, focusId ? 2.05 : 4) * zoomUser;
+    const cx = b.x + b.w / 2, cy = b.y + b.h / 2;
+    return { s: s0, ox: viewW / 2 - cx * s0, oy: viewH / 2 - cy * s0, cx, cy };
+  }
+  function camera() { cam = cameraBase(); }
+  function aplicarZoom(fator, sx, sy) {
+    const antes = unproject(sx ?? viewW / 2, sy ?? viewH / 2);
+    const next = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoomUser * fator));
+    if (Math.abs(next - zoomUser) < 0.001) return;
+    zoomUser = next;
+    camera();
+    // Mantém o ponto do cursor no mesmo lugar da tela.
+    const depois = project(antes.c, antes.r, 0);
+    cam.ox = (sx ?? viewW / 2) - depois.x * cam.s;
+    cam.oy = (sy ?? viewH / 2) - depois.y * cam.s;
+    const zb = document.getElementById('zoom-lbl');
+    if (zb) zb.textContent = Math.round(zoomUser * 100) + '%';
+  }
+  function resetZoom() {
+    zoomUser = 1;
+    camera();
+    const zb = document.getElementById('zoom-lbl');
+    if (zb) zb.textContent = '100%';
   }
   const toScreen = (x, y) => ({ x: x * cam.s + cam.ox, y: y * cam.s + cam.oy });
   function unproject(sx, sy) {
@@ -969,7 +1099,7 @@
     const feet = project(a.c, a.r, 0);
     const s = toScreen(feet.x, feet.y - 122 - (a.altoRobo ? 36 : 0));
     ctx.font = '700 12px system-ui,sans-serif';
-    const texto = tipo === 'aviso' ? 'aviso' : 'Falar';
+    const texto = tipo === 'aviso' ? 'aviso' : 'Chat';
     const w = ctx.measureText(texto).width + 28;
     const x = s.x - w / 2, y = s.y - 12;
     rr(x, y, w, 22, 8, '#fffdf6', '#1b1f2e');
@@ -1038,13 +1168,23 @@
     if (vista[0] < 30 && vista[1] > 20) pool(5, 22.4, 96, 'rgba(141,212,106,.22)');
     const list = [];
     const add = (k, fn) => list.push({ k, fn });
+    pcHit = null;
     if (vista[0] < 16) {
       add(7.2, drawMesaExec);
-      [[1, 9], [11, 9], [18, 7], [1, 13], [4, 15], [6, 13]].forEach(([c, r]) => add(c + r, () => drawPlant(c, r)));
-      add(26, drawMesaCopa); add(26.2, drawCafe); add(30, drawLounge);
+      [[1, 9], [11, 9], [18, 7], [1, 13], [4, 15], [6, 13], [15, 11], [3, 5]].forEach(([c, r]) => add(c + r, () => drawPlant(c, r)));
+      add(26, drawCozinha); add(30, drawLounge);
+      add(8.5, () => drawQuadro(8.9, 7.15));
+      add(15.2, () => drawQuadro(15.1, 7.15));
     }
-    if (vista[0] < 34 && vista[1] > 20) add(24.4, drawPalco);
-    if (vista[1] > 38) { add(39.3, drawLetreiro); add(40.5, drawArara); }
+    if (vista[0] < 34 && vista[1] > 20) {
+      add(24.4, drawPalco);
+      [[2, 25], [17, 22], [1, 31], [12, 31]].forEach(([c, r]) => add(c + r, () => drawPlant(c, r)));
+    }
+    if (vista[1] > 38) { add(39.3, drawLetreiro); add(40.5, drawArara); add(42, () => drawPlant(3, 43)); }
+    for (const rm of ROOMS) {
+      if (rm.r + rm.h < vista[0] || rm.r > vista[1]) continue;
+      add(rm.r + rm.c * 0.01, () => drawRoomName(rm));
+    }
     for (const a of agents) if (a.desk && visivel(a)) add(a.desk[0] + a.desk[1] + 0.2, () => drawDesk(a));
     for (const a of agents) if (visivel(a)) add(a.c + a.r + 0.05, () => drawAgent(a, andando(a)));
     list.sort((a, b) => a.k - b.k);
@@ -1060,6 +1200,7 @@
       }
     }
     if (rmFocus) ctx.restore();
+    if (vista[0] < 8) drawLogoWall();
     for (const a of agents) if (visivel(a)) {
       const feet = project(a.c, a.r, 0);
       const s = toScreen(feet.x, feet.y - 20);
@@ -1081,13 +1222,20 @@
     drawLabels();
     drawBaloes();
     hover = null;
+    let hoverPc = false;
     if (mouse) {
       let best = null, bd = 1e9;
-      for (const h of hits) { const d = Math.hypot(mouse.x - h.x, mouse.y - h.y); if (d < h.r && d < bd) { bd = d; best = h.a; } }
+      for (const h of hits) {
+        const d = Math.hypot(mouse.x - h.x, mouse.y - h.y);
+        if (d >= h.r || d >= bd) continue;
+        bd = d;
+        if (h.tipo === 'pc') { best = null; hoverPc = true; }
+        else { best = h.a; hoverPc = false; }
+      }
       hover = best;
     }
     const sobreBalao = mouse && baloes.some((b) => mouse.x >= b.x && mouse.x <= b.x + b.w && mouse.y >= b.y && mouse.y <= b.y + b.h);
-    cvs.style.cursor = hover || sobreBalao ? 'pointer' : 'crosshair';
+    cvs.style.cursor = hover || hoverPc || sobreBalao ? 'pointer' : 'crosshair';
     if (!ready) { ready = true; window.__workai.ready = true; }
   }
 
@@ -1191,10 +1339,11 @@
 
   function clique(x, y, pt) {
     const b = baloes.find((b) => x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h);
-    if (b) { abrir(b.a, pt); return; }
+    if (b) { abrirChat(b.a); return; }
     let best = null, bd = 1e9;
     for (const h of hits) { const d = Math.hypot(x - h.x, y - h.y); if (d < h.r && d < bd) { bd = d; best = h; } }
-    if (best) { abrir(best.a, pt); return; }
+    if (best?.tipo === 'pc') { abrirSsh(); return; }
+    if (best?.a) { abrirChat(best.a); return; }
     const wpt = unproject(x, y);
     const cell = perto(wpt.c, wpt.r, 3);
     if (!cell) return;
@@ -1209,7 +1358,7 @@
 
   const MOVER = new Set(['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 'a', 's', 'd']);
   addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { fechar(); return; }
+    if (e.key === 'Escape') { fechar(); fecharChat(); fecharSsh(); return; }
     const k = e.key.toLowerCase();
     if (!MOVER.has(k) || e.metaKey || e.ctrlKey || e.altKey) return;
     e.preventDefault();
@@ -1234,7 +1383,7 @@
   chip('dyno', 'Operação Dyno', '#8fd46a');
   chip('wear', 'Dynamo Wear', '#ff7a1a');
   ROOMS.forEach((r) => chip(r.id, r.short, r.col));
-  document.getElementById('centralizar').addEventListener('click', () => { seguir = true; focusId = ''; syncChips(); });
+  document.getElementById('centralizar').addEventListener('click', () => { resetZoom(); seguir = true; focusId = ''; syncChips(); });
   document.getElementById('para-salas').addEventListener('click', () => todosParaSalas());
   const btnFluxos = document.getElementById('fluxos');
   if (btnFluxos) btnFluxos.addEventListener('click', () => {
@@ -1245,6 +1394,120 @@
     if (fluxos && noEscritorio) setFocus('dyno');
   });
   syncChips();
+
+  // Zoom: roda, pinça e botões.
+  cvs.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const p = local(e);
+    aplicarZoom(e.deltaY < 0 ? 1.12 : 1 / 1.12, p.x, p.y);
+  }, { passive: false });
+  const pinça = new Map();
+  let pinçaDist = 0;
+  cvs.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'touch') return;
+    pinça.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pinça.size === 2) {
+      const [a, b] = [...pinça.values()];
+      pinçaDist = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+    }
+  });
+  cvs.addEventListener('pointermove', (e) => {
+    if (!pinça.has(e.pointerId) || pinça.size !== 2) return;
+    pinça.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    const [a, b] = [...pinça.values()];
+    const d = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+    const fator = d / pinçaDist;
+    if (fator > 1.02 || fator < 0.98) {
+      const rect = cvs.getBoundingClientRect();
+      aplicarZoom(fator, (a.x + b.x) / 2 - rect.left, (a.y + b.y) / 2 - rect.top);
+      pinçaDist = d;
+    }
+  });
+  const soltaPinça = (e) => { pinça.delete(e.pointerId); pinçaDist = 0; };
+  cvs.addEventListener('pointerup', soltaPinça);
+  cvs.addEventListener('pointercancel', soltaPinça);
+  document.getElementById('zoom-in')?.addEventListener('click', () => aplicarZoom(1.15));
+  document.getElementById('zoom-out')?.addEventListener('click', () => aplicarZoom(1 / 1.15));
+  document.getElementById('zoom-reset')?.addEventListener('click', () => { resetZoom(); seguir = true; focusId = ''; syncChips(); });
+
+  // SSH (em breve)
+  const ssh = document.getElementById('ssh-panel');
+  function abrirSsh() { if (ssh) ssh.hidden = false; }
+  function fecharSsh() { if (ssh) ssh.hidden = true; }
+  document.getElementById('ssh-fechar')?.addEventListener('click', fecharSsh);
+  ssh?.addEventListener('pointerdown', (e) => e.stopPropagation());
+
+  // Chat local — sem rede.
+  const chat = document.getElementById('chat');
+  const chatHist = document.getElementById('chat-hist');
+  const chatInput = document.getElementById('chat-input');
+  const chatNome = document.getElementById('chat-nome');
+  const CHAT_KEY = 'workai-chat-v1';
+  let chatAgente = null;
+  const lerChats = () => {
+    try { return JSON.parse(localStorage.getItem(CHAT_KEY) || '{}') || {}; }
+    catch { return {}; }
+  };
+  const gravarChats = (mapa) => {
+    try { localStorage.setItem(CHAT_KEY, JSON.stringify(mapa)); } catch {}
+  };
+  function bolha(papel, texto) {
+    const d = document.createElement('div');
+    d.className = 'chat-msg chat-' + papel;
+    d.textContent = texto;
+    return d;
+  }
+  function renderChat() {
+    if (!chatAgente || !chatHist) return;
+    const mapa = lerChats();
+    const lista = mapa[chatAgente.id] || [];
+    chatHist.replaceChildren();
+    chatHist.append(bolha('sistema', 'Chat ainda não conectado aos agentes. As mensagens ficam só neste navegador.'));
+    for (const m of lista) chatHist.append(bolha(m.papel, m.texto));
+    chatHist.scrollTop = chatHist.scrollHeight;
+  }
+  function respostaLocal(a, texto) {
+    const t = texto.trim().toLowerCase();
+    if (t === 'status' || t === '/status') return (a.sit || a.status || 'sem situação marcada') + ' · nível: ' + (a.nivel || 'não marcado') + '. (local)';
+    if (t === 'o que está fazendo' || t === '/fazendo' || t === 'fazendo') {
+      if (a.missao) return 'Há um aviso ilustrativo em andamento: ' + a.missao.texto;
+      if (andando(a)) return 'Estou a caminho, ainda na rotina ilustrativa.';
+      return 'Na mesa da ' + (a.room?.short || a.room?.name || 'sala') + ', em rotina ilustrativa.';
+    }
+    if (t === 'nova tarefa' || t === '/tarefa') return 'Ainda sem ponte com o agente real. A proposta está em workai/CHAT-PROPOSTA.md.';
+    return 'Recebi aqui no navegador, mas ainda não há conexão comigo. Nada foi enviado para fora.';
+  }
+  function enviarChat(texto) {
+    const limpo = String(texto || '').replace(/[\u0000-\u001f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 500);
+    if (!limpo || !chatAgente) return;
+    const mapa = lerChats();
+    const id = chatAgente.id;
+    const lista = mapa[id] || [];
+    lista.push({ papel: 'voce', texto: limpo, em: Date.now() });
+    lista.push({ papel: 'agente', texto: respostaLocal(chatAgente, limpo), em: Date.now() });
+    mapa[id] = lista.slice(-80);
+    gravarChats(mapa);
+    if (chatInput) chatInput.value = '';
+    renderChat();
+  }
+  function abrirChat(a) {
+    if (!chat || !a) return;
+    fechar();
+    chatAgente = a;
+    if (chatNome) chatNome.textContent = (a.ceo ? a.nome : a.name) + (a.coord ? ' ★' : '');
+    chat.hidden = false;
+    renderChat();
+    chatInput?.focus();
+  }
+  function fecharChat() {
+    if (chat) chat.hidden = true;
+    chatAgente = null;
+  }
+  document.getElementById('chat-fechar')?.addEventListener('click', fecharChat);
+  document.getElementById('chat-form')?.addEventListener('submit', (e) => { e.preventDefault(); enviarChat(chatInput?.value); });
+  chat?.querySelectorAll('[data-cmd]').forEach((b) => b.addEventListener('click', () => enviarChat(b.getAttribute('data-cmd'))));
+  document.getElementById('chat-ficha')?.addEventListener('click', () => { if (chatAgente) abrir(chatAgente, { x: 24, y: 80 }); });
+  chat?.addEventListener('pointerdown', (e) => e.stopPropagation());
 
   const arvore = document.getElementById('arvore');
   function montarArvore() {
@@ -1261,7 +1524,7 @@
       }
       el.append(document.createTextNode(texto));
       if (aoClicar) el.addEventListener('click', aoClicar);
-      else if (agente) el.addEventListener('click', () => abrir(agente, el.getBoundingClientRect()));
+      else if (agente) el.addEventListener('click', () => abrirChat(agente));
       arvore.append(el);
     };
     linha('n0', nomeCeo() + ' (CEO)', player, () => { seguir = true; focusId = ''; syncChips(); abrir(player, { x: 80, y: 120 }); });
@@ -1346,6 +1609,9 @@
       demoEm = 1e15;
     },
     salas: () => todosParaSalas(),
+    zoom: (f) => aplicarZoom(f),
+    chat: (nome) => abrirChat(achar(nome) || player),
+    ssh: () => abrirSsh(),
     amostraRotina: (n = 1000) => {
       const c = { home: 0, copa: 0, desc: 0, dir: 0, sala: 0, outros: 0 };
       const lista = agents.filter((a) => !a.ceo && !a.bot && !a.breve);

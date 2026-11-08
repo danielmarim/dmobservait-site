@@ -3,7 +3,7 @@
 // chave, token ou IP, e nada é enviado para fora.
 // Integração das falas: WorkAI.notify(agentId, texto, { demo: true }).
 (() => {
-  const COLS = 20, ROWS = 36, TW = 64, TH = 32, WALL = 52;
+  const COLS = 20, ROWS = 52, TW = 64, TH = 32, WALL = 52;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const PASSO = 1000 / 30;
 
@@ -22,12 +22,16 @@
     { id: 'cli', name: 'Clientes', short: 'Clientes', col: '#7eb6e0', c: 8, r: 27, w: 6, h: 3, ala: 'dyno' },
     { id: 'fin', name: 'Finanças', short: 'Finanças', col: '#e2b657', c: 15, r: 27, w: 4, h: 3, ala: 'dyno' },
     { id: 'tec', name: 'Tecnologia', sub: 'Estaleiro e Esteira', short: 'Tecnologia', col: '#3ec6e0', c: 1, r: 33, w: 12, h: 3, ala: 'dyno' },
-    { id: 'brev', name: 'Em breve', short: 'Em breve', col: '#8a8f99', c: 14, r: 33, w: 5, h: 3, ala: 'dyno', breve: true }
+    { id: 'brev', name: 'Em breve', short: 'Em breve', col: '#8a8f99', c: 14, r: 33, w: 5, h: 3, ala: 'dyno', breve: true },
+    { id: 'marca', name: 'Dynamo Wear', sub: 'EST. 2026', short: 'Marca', col: '#ff7a1a', piso: '#2a1c14cc', c: 1, r: 40, w: 11, h: 4, glass: true, ala: 'wear' },
+    { id: 'wped', name: 'Pedidos', short: 'Pedidos', col: '#ffb020', piso: '#241910cc', c: 13, r: 40, w: 6, h: 4, ala: 'wear' },
+    { id: 'wcom', name: 'Comissões', short: 'Comissões', col: '#e2c27a', piso: '#241910cc', c: 1, r: 47, w: 8, h: 3, ala: 'wear' },
+    { id: 'wcon', name: 'Conteúdo', short: 'Conteúdo', col: '#ff8a2a', piso: '#241910cc', c: 10, r: 47, w: 9, h: 3, ala: 'wear' }
   ];
   const room = (id) => ROOMS.find((r) => r.id === id);
   const salaDe = (c, r) => ROOMS.find((rm) => c >= rm.c && r >= rm.r && c < rm.c + rm.w && r < rm.r + rm.h) || null;
 
-  const PORTAS = [[8, 4], [9, 4], [3, 6], [4, 6], [9, 6], [10, 6], [16, 6], [17, 6], [3, 10], [4, 10], [9, 10], [10, 10], [16, 10], [17, 10], [2, 12], [3, 12], [7, 12], [8, 12], [12, 12], [13, 12], [17, 12], [7, 20], [8, 20], [14, 20], [15, 20], [4, 24], [5, 24], [14, 24], [15, 24], [2, 26], [3, 26], [9, 26], [10, 26], [16, 26], [17, 26], [2, 30], [3, 30], [9, 30], [10, 30], [16, 30], [4, 32], [5, 32], [8, 32], [9, 32], [16, 32]];
+  const PORTAS = [[8, 4], [9, 4], [3, 6], [4, 6], [9, 6], [10, 6], [16, 6], [17, 6], [3, 10], [4, 10], [9, 10], [10, 10], [16, 10], [17, 10], [2, 12], [3, 12], [7, 12], [8, 12], [12, 12], [13, 12], [17, 12], [7, 20], [8, 20], [14, 20], [15, 20], [4, 24], [5, 24], [14, 24], [15, 24], [2, 26], [3, 26], [9, 26], [10, 26], [16, 26], [17, 26], [2, 30], [3, 30], [9, 30], [10, 30], [16, 30], [4, 32], [5, 32], [8, 32], [9, 32], [16, 32], [3, 44], [4, 44], [15, 44], [16, 44], [2, 46], [3, 46], [12, 46], [13, 46]];
   const VAGAS = {
     copa: [[12, 13], [13, 13], [14, 13], [14, 15], [11, 14], [12, 15], [13, 15]],
     desc: [[16, 13], [16, 14], [18, 13], [17, 13], [17, 14]],
@@ -75,7 +79,13 @@
     { room: 'tec', name: 'Gauntlet', role: 'prova ao lado do Estaleiro', sit: 'No ar', cuida: 'A prova ao lado do Estaleiro.', nunca: 'Publica no lugar da esteira.', desk: [12, 33], c: 11.5, r: 35.35 },
     { room: 'brev', name: 'Partner AI', role: 'em breve', breve: true, sit: 'Em breve', cuida: 'Ainda sem função publicada.', nunca: 'Ainda não atua.', c: 15.5, r: 34.35 },
     { room: 'brev', name: 'Ads AI', role: 'em breve', breve: true, sit: 'Em breve', cuida: 'Ainda sem função publicada.', nunca: 'Ainda não atua.', c: 17.5, r: 34.35 },
-    { room: 'brev', name: 'Guard AI', role: 'em breve', breve: true, sit: 'Em breve', cuida: 'Ainda sem função publicada.', nunca: 'Ainda não atua.', c: 16.5, r: 35.35 }
+    { room: 'brev', name: 'Guard AI', role: 'em breve', breve: true, sit: 'Em breve', cuida: 'Ainda sem função publicada.', nunca: 'Ainda não atua.', c: 16.5, r: 35.35 },
+    { room: 'marca', name: 'Dyna 2.0', role: 'agente-chefe da Dynamo Wear', chefe: true, tom: '#ff7a1a', sit: 'Chefe do setor', cuida: 'O setor Dynamo Wear e a fila do time.', nunca: 'Mostra dado de afiliado, cupom, pedido ou valor.', c: 5.5, r: 42.35 },
+    { room: 'marca', name: 'Afiliados', role: 'cadastro de afiliados', proposta: true, sit: 'Proposta', cuida: 'O cadastro de afiliados: status e aprovação.', nunca: 'Expõe nome, contato ou chave de pagamento.', desk: [2, 40], c: 2.5, r: 41.4 },
+    { room: 'marca', name: 'Cupons', role: 'cupons da loja', proposta: true, sit: 'Proposta', cuida: 'O cupom ligado ao afiliado e o desconto na loja.', nunca: 'Cria um cupom real nem mostra código.', desk: [9, 40], c: 9.5, r: 41.4 },
+    { room: 'wped', name: 'Pedidos', role: 'pedidos da loja', proposta: true, sit: 'Proposta', cuida: 'O pedido da loja atribuído a um afiliado.', nunca: 'Mostra pedido, cliente ou valor.', desk: [14, 40], c: 15.5, r: 41.4 },
+    { room: 'wcom', name: 'Comissões', role: 'comissão e saque', proposta: true, sit: 'Proposta', cuida: 'A comissão da venda e o pedido de saque.', nunca: 'Paga. Dinheiro nunca passa do nível 2.', desk: [2, 47], c: 4.5, r: 48.35 },
+    { room: 'wcon', name: 'Conteúdo', role: 'presença de creator', proposta: true, sit: 'Proposta', cuida: 'A presença de creator no perfil do afiliado.', nunca: 'Publica peça nem cita creator real.', desk: [11, 47], c: 14.5, r: 48.35 }
   ];
 
   const W = new Uint8Array(COLS * ROWS);
@@ -111,8 +121,16 @@
   fill(1, 31, 18, 31);
   fill(1, 33, 12, 35);
   fill(14, 33, 18, 35);
+  fill(8, 36, 9, 37);
+  fill(6, 38, 12, 39);
+  fill(1, 39, 18, 39);
+  fill(1, 40, 11, 43);
+  fill(13, 40, 18, 43);
+  fill(1, 45, 18, 45);
+  fill(1, 47, 8, 49);
+  fill(10, 47, 18, 49);
   for (const [c, r] of PORTAS) mark(c, r, 1);
-  const BLOQUEIOS = [[7, 1], [8, 1], [9, 1], [10, 1], [8, 0], [9, 0], [12, 14], [13, 14], [11, 15], [17, 15], [18, 15], [16, 15], [18, 14], [1, 9], [11, 9], [18, 7], [1, 13], [4, 15], [6, 13], [3, 21], [4, 21], [5, 21], [4, 22], [5, 22]];
+  const BLOQUEIOS = [[7, 1], [8, 1], [9, 1], [10, 1], [8, 0], [9, 0], [12, 14], [13, 14], [11, 15], [17, 15], [18, 15], [16, 15], [18, 14], [1, 9], [11, 9], [18, 7], [1, 13], [4, 15], [6, 13], [3, 21], [4, 21], [5, 21], [4, 22], [5, 22], [6, 40], [7, 40]];
   for (const a of RAW) if (a.desk) BLOQUEIOS.push(a.desk);
   for (const [c, r] of BLOQUEIOS) mark(c, r, 0);
 
@@ -130,14 +148,14 @@
     return {
       roomId: a.room, room: rm, name: a.name, id: slug(a.name), role: a.role,
       coord: !!a.coord, shield: !!a.shield, bot: !!a.bot, ceo: !!a.ceo, desk: a.desk || null,
-      destaque: !!a.destaque, brief: !!a.brief, breve: !!a.breve, tom: a.tom || '',
+      destaque: !!a.destaque, brief: !!a.brief, breve: !!a.breve, chefe: !!a.chefe, proposta: !!a.proposta, tom: a.tom || '',
       sit: a.sit || '', nivel: a.nivel || (a.cuida ? 'não marcado' : ''),
       cuida: a.cuida || '', nunca: a.nunca || '',
       homeC: a.c, homeR: a.r, c: a.c, r: a.r,
       hair: a.ceo ? '#2a1810' : a.name === 'Dina' ? '#6d3ea3' : HAIR[h % HAIR.length],
       skin: a.ceo ? '#e4b48e' : a.bot ? '#d7f6ff' : a.name === 'Dina' ? '#f6d0dc' : SKIN[h % SKIN.length],
       hairStyle: a.ceo ? 0 : h % 6, ph: (h % 628) / 100,
-      status: a.ceo || a.breve || rm.ala === 'dyno' ? null : STATUS[h % 4],
+      status: a.ceo || a.breve || rm.ala === 'dyno' || rm.ala === 'wear' ? null : STATUS[h % 4],
       nome: a.ceo ? 'Daniel' : a.name,
       caminho: null, passo: 0, espera: 1200 + (h % 5000), fila: [], missao: null, trava: 0, repath: 0, ultimoAlvo: ''
     };
@@ -147,10 +165,12 @@
   if (erros.length) console.warn('WorkAI mapa', erros.join('; '));
 
   // O robô verde é só o Dyno AI. O Dyno Bot (CTO) continua o holograma com coroa.
+  // A Dyna 2.0 é o robô preto e laranja, com o W. Não é a Dina.
   const ROBOS = {
     Daniel: { cor: '#e2c27a', base: '/workai/assets/avatares/daniel', alto: 102 },
     'Dyno AI': { cor: '#3ddc97', base: '/workai/assets/avatares/dyno', alto: 98 },
-    Dina: { cor: '#ff4fa3', base: '/workai/assets/avatares/dina', alto: 90 }
+    Dina: { cor: '#ff4fa3', base: '/workai/assets/avatares/dina', alto: 90 },
+    'Dyna 2.0': { cor: '#ff7a1a', base: '/workai/assets/avatares/dyna', alto: 96 }
   };
   const carregarImg = (src) => {
     if (typeof Image !== 'function') return null;
@@ -180,6 +200,8 @@
   const nomeCeo = () => player.nome || 'Daniel';
   const reportsTo = (a) => {
     if (a.ceo) return '';
+    if (a.chefe) return nomeCeo() + ' (CEO)';
+    if (a.room?.ala === 'wear') return 'Dyna 2.0';
     if (a.bot || a.brief) return nomeCeo() + ' (CEO)';
     if (a.room?.ala === 'dyno') return 'Brief AI';
     if (a.coord || a.roomId === 'op') return 'Dyno Bot (CTO)';
@@ -408,7 +430,13 @@
     'Testes': 'A verificação ilustrativa da esteira terminou.',
     'Revisor': 'A revisão ilustrativa da esteira está na fila.',
     'Sentinela Esteira': 'O passo ilustrativo de publicação foi observado.',
-    'Gauntlet': 'A prova ilustrativa ao lado do Estaleiro terminou.'
+    'Gauntlet': 'A prova ilustrativa ao lado do Estaleiro terminou.',
+    'Dyna 2.0': 'O setor ilustrativo da Dynamo Wear tem um aviso.',
+    Afiliados: 'Um cadastro ilustrativo de afiliado espera leitura.',
+    Cupons: 'Um cupom ilustrativo da loja espera revisão.',
+    Pedidos: 'Um pedido ilustrativo da loja foi atribuído.',
+    'Comissões': 'Uma comissão ilustrativa espera aprovação. Dinheiro não passa do nível 2.',
+    'Conteúdo': 'Uma peça ilustrativa de creator ficou no rascunho.'
   };
   function tickDemo(dt) {
     demoEm -= dt;
@@ -505,6 +533,7 @@
   }
   function boundsOf(id) {
     if (id === 'dyno') return caixa(0, 18.2, COLS, 36.3);
+    if (id === 'wear') return caixa(0, 37.2, COLS, ROWS + 0.3);
     if (!id || id === 'dm') return caixa(0, -0.4, COLS, 16.8);
     const rm = room(id);
     if (!rm) return caixa(0, -0.4, COLS, 16.8);
@@ -515,17 +544,27 @@
       const r = Math.floor(player.r);
       return [Math.max(0, r - 12), Math.min(ROWS - 1, r + 10)];
     }
-    if (focusId === 'dyno') return [18, ROWS - 1];
+    if (focusId === 'dyno') return [18, 36];
+    if (focusId === 'wear') return [37, ROWS - 1];
     const rm = room(focusId);
     if (rm) return [Math.max(0, rm.r - 2), Math.min(ROWS - 1, rm.r + rm.h + 2)];
     return [0, 17];
   }
   function drawWalls() {
     const h = WALL;
-    quad(project(0, -0.2, h), project(COLS, -0.2, h), project(COLS, -0.2, 0), project(0, -0.2, 0), '#3a342c');
-    quad(project(-0.2, 0, h), project(-0.2, ROWS, h), project(-0.2, ROWS, 0), project(-0.2, 0, 0), '#2e2924');
-    quad(project(0, -0.2, h + 5), project(COLS, -0.2, h + 5), project(COLS, -0.2, h), project(0, -0.2, h), '#e2c27a');
-    quad(project(-0.2, 0, h + 5), project(-0.2, ROWS, h + 5), project(-0.2, ROWS, h), project(-0.2, 0, h), '#c4a15a');
+    const faixa = (c0, c1, r, col, cap) => {
+      quad(project(c0, r, h), project(c1, r, h), project(c1, r, 0), project(c0, r, 0), col);
+      quad(project(c0, r, h + 5), project(c1, r, h + 5), project(c1, r, h), project(c0, r, h), cap);
+    };
+    const lado = (c, r0, r1, col, cap) => {
+      quad(project(c, r0, h), project(c, r1, h), project(c, r1, 0), project(c, r0, 0), col);
+      quad(project(c, r0, h + 5), project(c, r1, h + 5), project(c, r1, h), project(c, r0, h), cap);
+    };
+    faixa(0, COLS, -0.2, '#3a342c', '#e2c27a');
+    lado(-0.2, 0, 36, '#2e2924', '#c4a15a');
+    faixa(0, 7.6, 37.8, '#161616', '#ff7a1a');
+    faixa(10.4, COLS, 37.8, '#161616', '#ff7a1a');
+    lado(-0.2, 38, ROWS, '#121212', '#ff7a1a');
   }
   function tile(c, r, col) {
     quad(project(c, r), project(c + 1, r), project(c + 1, r + 1), project(c, r + 1), col);
@@ -533,26 +572,34 @@
   function drawFloor() {
     const [r0, r1] = vista;
     for (let r = r0; r <= r1; r++) for (let c = 0; c < COLS; c++) if (W[at(c, r)]) {
-      tile(c, r, (c + r) % 2 ? '#171a22' : '#1c1f29');
+      const zona = r >= 38 ? 'wear' : (r >= 36 ? 'ponte' : 'casa');
+      const cor = zona === 'wear' ? ((c + r) % 2 ? '#121214' : '#1a1a1d') : zona === 'ponte' ? ((c + r) % 2 ? '#2a2118' : '#3a2c1e') : ((c + r) % 2 ? '#171a22' : '#1c1f29');
+      tile(c, r, cor);
     }
     for (const rm of ROOMS) {
       if (rm.r + rm.h < r0 || rm.r > r1) continue;
       ctx.save();
       if (rm.breve) ctx.globalAlpha = 0.42;
-      quad(project(rm.c, rm.r), project(rm.c + rm.w, rm.r), project(rm.c + rm.w, rm.r + rm.h), project(rm.c, rm.r + rm.h), rm.col + (rm.glass ? '99' : '66'));
+      quad(project(rm.c, rm.r), project(rm.c + rm.w, rm.r), project(rm.c + rm.w, rm.r + rm.h), project(rm.c, rm.r + rm.h), rm.piso || (rm.col + (rm.glass ? '99' : '66')));
       ctx.beginPath();
       const a = project(rm.c, rm.r), b = project(rm.c + rm.w, rm.r), c = project(rm.c + rm.w, rm.r + rm.h), d = project(rm.c, rm.r + rm.h);
       ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.lineTo(c.x, c.y); ctx.lineTo(d.x, d.y); ctx.closePath();
-      ctx.strokeStyle = rm.id === 'odyn' ? '#d7f5b0' : rm.col;
+      ctx.strokeStyle = rm.ala === 'wear' ? '#ff7a1a' : rm.id === 'odyn' ? '#d7f5b0' : rm.col;
       ctx.globalAlpha = rm.breve ? 0.45 : rm.glass ? 0.95 : 0.55;
-      ctx.lineWidth = rm.id === 'odyn' ? 3.2 : rm.glass ? 2.4 : 1.5;
+      ctx.lineWidth = rm.ala === 'wear' || rm.id === 'odyn' ? 3.2 : rm.glass ? 2.4 : 1.5;
       ctx.stroke();
       ctx.restore();
     }
     for (const [c, r] of PORTAS) if (r >= r0 && r <= r1) tile(c, r, '#3a3428');
-    const edge = [project(0, 0), project(COLS, 0), project(COLS, ROWS), project(0, ROWS)];
-    ctx.beginPath(); edge.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y))); ctx.closePath();
-    ctx.strokeStyle = 'rgba(226,194,122,.8)'; ctx.lineWidth = 2; ctx.stroke();
+    const o = (c, r) => project(c, r);
+    const contorno = (pts, cor) => {
+      ctx.beginPath();
+      pts.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
+      ctx.closePath();
+      ctx.strokeStyle = cor; ctx.lineWidth = 2; ctx.stroke();
+    };
+    contorno([o(0, 0), o(COLS, 0), o(COLS, 36), o(10.3, 36), o(10.3, 36.15), o(7.7, 36.15), o(7.7, 36), o(0, 36)], 'rgba(226,194,122,.8)');
+    contorno([o(0, 38), o(7.7, 38), o(7.7, 37.85), o(10.3, 37.85), o(10.3, 38), o(COLS, 38), o(COLS, ROWS), o(0, ROWS)], 'rgba(255,122,26,.9)');
   }
   function medallion(c, r) {
     const p = project(c, r, 0);
@@ -633,9 +680,34 @@
     box(3.05, 21.05, 2.7, 1.15, 10, '#d7f5b0', '#6ea84a', '#3e6a2c');
     box(3.35, 21.3, 2.1, 0.55, 16, '#e2c27a', '#a6853f', '#6e5424');
   }
+  function drawArara() {
+    box(5.7, 40.15, 1.7, 0.32, 20, '#141414', '#0e0e0e', '#080808');
+    box(5.82, 40.2, 0.12, 0.2, 28, '#ff7a1a', '#c45a10', '#8a3c08');
+    box(7.05, 40.2, 0.12, 0.2, 28, '#ff7a1a', '#c45a10', '#8a3c08');
+    const p = project(6.55, 40.28, 24);
+    ctx.fillStyle = '#111';
+    ctx.fillRect(p.x - 16, p.y - 10, 18, 14);
+    ctx.strokeStyle = '#ff7a1a'; ctx.lineWidth = 1; ctx.strokeRect(p.x - 16, p.y - 10, 18, 14);
+  }
+  function drawLetreiro() {
+    const p = project(6.1, 39.15, 36);
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.fillStyle = '#111';
+    ctx.fillRect(-58, -24, 116, 40);
+    ctx.strokeStyle = '#ff7a1a'; ctx.lineWidth = 1.6; ctx.strokeRect(-58, -24, 116, 40);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#fff'; ctx.font = '800 14px system-ui,sans-serif';
+    ctx.fillText('DYNAMO', 0, -8);
+    ctx.fillStyle = '#ff7a1a'; ctx.font = '800 11px system-ui,sans-serif';
+    ctx.fillText('WEAR', 0, 6);
+    ctx.fillStyle = '#f4efe4'; ctx.font = '600 7px system-ui,sans-serif';
+    ctx.fillText('EST. 2026', 0, 16);
+    ctx.restore();
+  }
   function drawFluxos() {
     if (!fluxos) return;
-    const ala = focusId === 'dyno' || (seguir && player.r > 17) || room(focusId)?.ala === 'dyno';
+    const ala = focusId === 'dyno' || room(focusId)?.ala === 'dyno' || (seguir && player.r > 17 && player.r < 36);
     if (!ala) return;
     const pos = (nome) => { const a = achar(nome); return project(a.homeC, a.homeR, 3); };
     const est = project(6.2, 34.1, 3);
@@ -679,7 +751,7 @@
     const larg = alto * (img.naturalWidth / img.naturalHeight);
     ctx.save();
     ctx.translate(feet.x, feet.y);
-    const marca = a.destaque || a.ceo;
+    const marca = a.destaque || a.ceo || a.chefe;
     ellipse(0, 3, marca ? 20 : 16, 7, 'rgba(0,0,0,.32)');
     if (!reduce) {
       ctx.strokeStyle = a.corRobo;
@@ -792,14 +864,15 @@
   function visivel(a) {
     if (seguir) return Math.abs(a.r - player.r) < 14 && Math.abs(a.c - player.c) < 16;
     if (focusId === 'dyno') return a.room?.ala === 'dyno';
-    if (focusId === 'dm' || !focusId) return a.room?.ala !== 'dyno';
+    if (focusId === 'wear') return a.room?.ala === 'wear';
+    if (focusId === 'dm' || !focusId) return a.room?.ala === 'dm';
     return a.roomId === focusId;
   }
 
   function drawLabels() {
     const overview = !seguir && ((focusId === 'dyno' && cam.s < 0.95) || ((focusId === 'dm' || !focusId) && cam.s < 0.72));
     if (overview) {
-      const ala = focusId === 'dyno' ? 'dyno' : 'dm';
+      const ala = focusId === 'dyno' ? 'dyno' : focusId === 'wear' ? 'wear' : 'dm';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = '700 12px system-ui,sans-serif';
       for (const rm of ROOMS) {
         if (rm.ala !== ala) continue;
@@ -824,8 +897,8 @@
       for (const p of placed) if (Math.abs(p.x - s.x) < (p.w + w) / 2 && Math.abs(p.y - y) < 18) y = p.y - 18;
       placed.push({ x: s.x, y, w });
       const hot = hover === a;
-      const claro = hot || a.ceo || a.destaque || a.name === 'Dina';
-      const borda = a.ceo ? '#e2c27a' : a.name === 'Dina' ? '#ff4fa3' : a.destaque ? '#3ddc97' : a.room.col;
+      const claro = hot || a.ceo || a.destaque || a.chefe || a.name === 'Dina';
+      const borda = a.ceo ? '#e2c27a' : (a.corRobo || (a.destaque ? '#3ddc97' : a.room.col));
       rr(s.x - w / 2, y - 10, w, 20, 8, claro ? '#fffdf6' : 'rgba(8,10,16,.88)', borda);
       ctx.fillStyle = claro ? '#1b1f2e' : '#fff';
       ctx.fillText(label, s.x + (a.status ? 4 : 0), y);
@@ -873,7 +946,7 @@
   }
   function drawLegendaFluxos() {
     if (!fluxos) return;
-    const ala = focusId === 'dyno' || room(focusId)?.ala === 'dyno' || (seguir && player.r > 17);
+    const ala = focusId === 'dyno' || room(focusId)?.ala === 'dyno' || (seguir && player.r > 17 && player.r < 36);
     if (!ala) return;
     const itens = [['#f0a05a', 'Cliente novo'], ['#7eb6e0', 'Chamado'], ['#3ec6e0', 'Erro no ambiente'], ['#f0d78c', 'Gestão → Daniel']];
     ctx.font = '700 12px system-ui,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
@@ -923,7 +996,7 @@
       pool(17.2, 14.4, 60, 'rgba(126,200,195,.16)');
       medallion(9.5, 5.5);
     }
-    if (vista[1] > 20) pool(5, 22.4, 96, 'rgba(141,212,106,.22)');
+    if (vista[0] < 30 && vista[1] > 20) pool(5, 22.4, 96, 'rgba(141,212,106,.22)');
     const list = [];
     const add = (k, fn) => list.push({ k, fn });
     if (vista[0] < 16) {
@@ -931,7 +1004,8 @@
       [[1, 9], [11, 9], [18, 7], [1, 13], [4, 15], [6, 13]].forEach(([c, r]) => add(c + r, () => drawPlant(c, r)));
       add(26, drawMesaCopa); add(26.2, drawCafe); add(30, drawLounge);
     }
-    if (vista[1] > 20) add(24.4, drawPalco);
+    if (vista[0] < 34 && vista[1] > 20) add(24.4, drawPalco);
+    if (vista[1] > 38) { add(39.3, drawLetreiro); add(40.5, drawArara); }
     for (const a of agents) if (a.desk && visivel(a)) add(a.desk[0] + a.desk[1] + 0.2, () => drawDesk(a));
     for (const a of agents) if (visivel(a)) add(a.c + a.r + 0.05, () => drawAgent(a, andando(a)));
     list.sort((a, b) => a.k - b.k);
@@ -955,8 +1029,8 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (focusId && !seguir) {
       const rm = room(focusId);
-      const texto = rm ? (rm.sub ? rm.name + ' · ' + rm.sub : rm.name) : (focusId === 'dyno' ? 'Operação Dyno' : 'Escritório');
-      const col = rm ? rm.col : (focusId === 'dyno' ? '#8fd46a' : '#e2c27a');
+      const texto = rm ? (rm.sub ? rm.name + ' · ' + rm.sub : rm.name) : (focusId === 'dyno' ? 'Operação Dyno' : focusId === 'wear' ? 'Dynamo Wear · EST. 2026' : 'Escritório');
+      const col = rm ? rm.col : (focusId === 'dyno' ? '#8fd46a' : focusId === 'wear' ? '#ff7a1a' : '#e2c27a');
       ctx.font = '700 13px system-ui,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
       const w = ctx.measureText(texto).width + 16;
       rr(12, 10, w, 22, 8, 'rgba(8,10,16,.88)');
@@ -1009,7 +1083,7 @@
     h.id = 'card-nome';
     h.textContent = (a.ceo ? a.nome : a.name) + (a.coord ? ' ★' : '') + (a.shield ? ' 🛡' : '');
     const papel = document.createElement('p'); papel.className = 'papel';
-    papel.textContent = a.ceo ? 'CEO' : a.bot ? 'CTO' : a.destaque ? 'Carro-chefe' : a.name === 'Dina' ? 'Agenda e rotina' : a.brief ? 'Ponte de gestão' : a.breve ? 'Em breve' : a.coord ? 'Coordenador' : a.shield ? 'Segurança' : 'Agente';
+    papel.textContent = a.ceo ? 'CEO' : a.bot ? 'CTO' : a.chefe ? 'Chefe da Dynamo Wear' : a.proposta ? 'Proposta' : a.destaque ? 'Carro-chefe' : a.name === 'Dina' ? 'Agenda e rotina' : a.brief ? 'Ponte de gestão' : a.breve ? 'Em breve' : a.coord ? 'Coordenador' : a.shield ? 'Segurança' : 'Agente';
     const area = document.createElement('p'); area.className = 'area';
     const dot = document.createElement('span'); dot.className = 'ponto'; dot.style.background = a.room.col;
     area.append(dot, document.createTextNode(a.room.sub ? a.room.name + ' · ' + a.room.sub : a.room.name));
@@ -1036,6 +1110,7 @@
       corpo.append(p);
     };
     if (a.bot) { const g = document.createElement('p'); g.textContent = 'Gerente dos agentes.'; corpo.append(g); }
+    else if (a.chefe) { const g = document.createElement('p'); g.textContent = 'Agente-chefe da Dynamo Wear. Responde ao Daniel.'; corpo.append(g); }
     else if (!a.ceo && !a.cuida) {
       const role = document.createElement('p');
       role.textContent = a.role.charAt(0).toUpperCase() + a.role.slice(1) + '.';
@@ -1118,6 +1193,7 @@
   }
   chip('dm', 'Escritório', '#e2c27a');
   chip('dyno', 'Operação Dyno', '#8fd46a');
+  chip('wear', 'Dynamo Wear', '#ff7a1a');
   ROOMS.forEach((r) => chip(r.id, r.short, r.col));
   document.getElementById('centralizar').addEventListener('click', () => { seguir = true; focusId = ''; syncChips(); });
   const btnFluxos = document.getElementById('fluxos');
@@ -1152,7 +1228,7 @@
     linha('n1', 'Dyno Bot · CTO · gerente', achar('Dyno Bot'));
     linha('n2', 'Recap AI', achar('Recap AI'));
     for (const rm of ROOMS) {
-      if (rm.id === 'dir' || rm.id === 'copa' || rm.id === 'desc' || rm.id === 'op') continue;
+      if (rm.ala !== 'dm' || rm.id === 'dir' || rm.id === 'copa' || rm.id === 'desc' || rm.id === 'op') continue;
       const coord = agents.find((a) => a.roomId === rm.id && a.coord);
       if (!coord) continue;
       linha('n2', '★ ' + coord.name + ' · ' + rm.short, coord);
@@ -1167,6 +1243,9 @@
       linha('n2', rm.short, null, () => setFocus(id));
       agents.filter((a) => a.roomId === id).forEach((a) => linha(a.breve ? 'n3 breve' : 'n3', a.name, a));
     }
+    linha('n1', 'Dynamo Wear', null, () => setFocus('wear'));
+    linha('n2', 'Dyna 2.0 · chefe', achar('Dyna 2.0'));
+    for (const nome of ['Afiliados', 'Cupons', 'Pedidos', 'Comissões', 'Conteúdo']) linha('n3', nome + ' · proposta', achar(nome));
   }
   montarArvore();
 
@@ -1226,7 +1305,7 @@
       abrir(a, { x: x == null ? 640 : x, y: y == null ? 120 : y });
       return document.getElementById('card-corpo').textContent;
     },
-    robosProntos: () => ['Daniel', 'Dyno AI', 'Dina'].every((n) => {
+    robosProntos: () => ['Daniel', 'Dyno AI', 'Dina', 'Dyna 2.0'].every((n) => {
       const a = achar(n);
       return !!(a && spriteRobo(a));
     }),

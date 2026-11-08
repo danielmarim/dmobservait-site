@@ -69,7 +69,7 @@ Conferir, sem cookie:
 - `https://workai.dmobservait.com/` → 302 para `/admin/login`
 - a página de login é a mesma do painel
 - `/workai/workai.js` sem sessão → 401
-- `/workai/assets/avatares/*.webp` sem sessão → 401 (o Daniel e os robôs oficiais do Dyno AI e da Dina)
+- `/workai/assets/avatares/*.webp` sem sessão → 401 (o Daniel, a Dyna 2.0 e os robôs oficiais do Dyno AI e da Dina)
 
 Com a sessão criada nessa origem, `/` mostra o escritório. `Sair` posta em
 `/admin/auth/sair` e volta para `/admin/login`.

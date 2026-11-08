@@ -50,7 +50,13 @@
     entrar.disabled = true;
     try {
       const r = await chamar('/admin/auth/entrar', { codigo: c, ticket });
-      if (r.ok) { msg('Entrando…', 'ok'); location.assign(r.j.destino || '/admin/'); return; }
+      if (r.ok) {
+        msg('Entrando…', 'ok');
+        // workai.dmobservait.com usa esta mesma tela. O cookie __Host- não atravessa o subdomínio;
+        // a sessão daqui volta para o escritório, não para o painel.
+        location.assign(location.hostname === 'workai.dmobservait.com' ? '/' : (r.j.destino || '/admin/'));
+        return;
+      }
       msg(r.j.erro || 'Código inválido ou expirado. Peça um novo código.', 'erro'); codigo.select();
     } catch { msg('Sem conexão. Tente de novo.', 'erro'); }
     finally { entrar.disabled = false; }

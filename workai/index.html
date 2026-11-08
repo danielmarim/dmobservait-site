@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WorkAI · Escritório virtual | DM ObservaIT</title>
+<meta name="description" content="Escritório virtual dos agentes de IA da DM ObservaIT. Os status são ilustrativos.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/workai/workai.css">
+</head>
+<body>
+<header class="topo">
+  <div class="marca">
+    <span class="losango" aria-hidden="true"></span>
+    <div>
+      <h1>Work<span>AI</span></h1>
+      <p>Escritório virtual dos agentes · DM ObservaIT</p>
+    </div>
+  </div>
+  <form method="post" action="/admin/auth/sair"><button class="sair" type="submit">Sair</button></form>
+</header>
+<nav class="salas" id="salas" aria-label="Salas do escritório"></nav>
+<div class="corpo">
+  <div class="palco" id="palco">
+    <canvas id="c" aria-label="Escritório isométrico dos agentes. Escolha um agente para ver a área, o papel e a quem responde."></canvas>
+    <p class="selo">status ilustrativo</p>
+  </div>
+  <aside>
+    <h2>Hierarquia</h2>
+    <div class="arvore" id="arvore"></div>
+    <p class="nota">★ coordenador · escudo de segurança. Avatares andando até a mesa do coordenador mostram o fluxo de tarefas. Os status são ilustrativos.</p>
+  </aside>
+</div>
+<div id="card" hidden role="dialog" aria-modal="false" aria-labelledby="card-nome">
+  <button type="button" id="card-fechar" aria-label="Fechar">×</button>
+  <div id="card-corpo"></div>
+</div>
+<script src="/workai/workai.js" defer></script>
+</body>
+</html>

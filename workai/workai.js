@@ -23,15 +23,16 @@
     { id: 'fin', name: 'Finanças', short: 'Finanças', col: '#e2b657', c: 15, r: 27, w: 4, h: 3, ala: 'dyno' },
     { id: 'tec', name: 'Tecnologia', sub: 'Estaleiro e Esteira', short: 'Tecnologia', col: '#3ec6e0', c: 1, r: 33, w: 12, h: 3, ala: 'dyno' },
     { id: 'brev', name: 'Em breve', short: 'Em breve', col: '#8a8f99', c: 14, r: 33, w: 5, h: 3, ala: 'dyno', breve: true },
-    { id: 'marca', name: 'Dynamo Wear', sub: 'EST. 2026', short: 'Marca', col: '#ff7a1a', piso: '#2a1c14cc', c: 1, r: 40, w: 11, h: 4, glass: true, ala: 'wear' },
-    { id: 'wped', name: 'Pedidos', short: 'Pedidos', col: '#ffb020', piso: '#241910cc', c: 13, r: 40, w: 6, h: 4, ala: 'wear' },
-    { id: 'wcom', name: 'Comissões', short: 'Comissões', col: '#e2c27a', piso: '#241910cc', c: 1, r: 47, w: 8, h: 3, ala: 'wear' },
-    { id: 'wcon', name: 'Conteúdo', short: 'Conteúdo', col: '#ff8a2a', piso: '#241910cc', c: 10, r: 47, w: 9, h: 3, ala: 'wear' }
+    { id: 'marca', name: 'Dynamo Wear', sub: 'atendimento', short: 'Atendimento', col: '#ff7a1a', piso: '#2a1c14cc', c: 1, r: 40, w: 11, h: 4, glass: true, ala: 'wear' },
+    { id: 'wped', name: 'Portal', sub: 'afiliados e creators', short: 'Portal', col: '#ffb020', piso: '#241910cc', c: 13, r: 40, w: 6, h: 4, ala: 'wear' },
+    { id: 'wcom', name: 'Financeiro', short: 'Financeiro', col: '#e2c27a', piso: '#241910cc', c: 1, r: 47, w: 8, h: 3, ala: 'wear' },
+    { id: 'wcon', name: 'Produção', sub: 'estoque', short: 'Produção', col: '#ff8a2a', piso: '#241910cc', c: 10, r: 47, w: 5, h: 3, ala: 'wear' },
+    { id: 'wsaida', name: 'Saída de parceiro', short: 'Saída', col: '#8a8f99', piso: '#1c1c1eaa', c: 16, r: 47, w: 3, h: 3, ala: 'wear', breve: true }
   ];
   const room = (id) => ROOMS.find((r) => r.id === id);
   const salaDe = (c, r) => ROOMS.find((rm) => c >= rm.c && r >= rm.r && c < rm.c + rm.w && r < rm.r + rm.h) || null;
 
-  const PORTAS = [[8, 4], [9, 4], [3, 6], [4, 6], [9, 6], [10, 6], [16, 6], [17, 6], [3, 10], [4, 10], [9, 10], [10, 10], [16, 10], [17, 10], [2, 12], [3, 12], [7, 12], [8, 12], [12, 12], [13, 12], [17, 12], [7, 20], [8, 20], [14, 20], [15, 20], [4, 24], [5, 24], [14, 24], [15, 24], [2, 26], [3, 26], [9, 26], [10, 26], [16, 26], [17, 26], [2, 30], [3, 30], [9, 30], [10, 30], [16, 30], [4, 32], [5, 32], [8, 32], [9, 32], [16, 32], [3, 44], [4, 44], [15, 44], [16, 44], [2, 46], [3, 46], [12, 46], [13, 46]];
+  const PORTAS = [[8, 4], [9, 4], [3, 6], [4, 6], [9, 6], [10, 6], [16, 6], [17, 6], [3, 10], [4, 10], [9, 10], [10, 10], [16, 10], [17, 10], [2, 12], [3, 12], [7, 12], [8, 12], [12, 12], [13, 12], [17, 12], [7, 20], [8, 20], [14, 20], [15, 20], [4, 24], [5, 24], [14, 24], [15, 24], [2, 26], [3, 26], [9, 26], [10, 26], [16, 26], [17, 26], [2, 30], [3, 30], [9, 30], [10, 30], [16, 30], [4, 32], [5, 32], [8, 32], [9, 32], [16, 32], [3, 44], [4, 44], [15, 44], [16, 44], [2, 46], [3, 46], [12, 46], [13, 46], [16, 46], [17, 46]];
   const VAGAS = {
     copa: [[12, 13], [13, 13], [14, 13], [14, 15], [11, 14], [12, 15], [13, 15]],
     desc: [[16, 13], [16, 14], [18, 13], [17, 13], [17, 14]],
@@ -80,12 +81,14 @@
     { room: 'brev', name: 'Partner AI', role: 'em breve', breve: true, sit: 'Em breve', cuida: 'Ainda sem função publicada.', nunca: 'Ainda não atua.', c: 15.5, r: 34.35 },
     { room: 'brev', name: 'Ads AI', role: 'em breve', breve: true, sit: 'Em breve', cuida: 'Ainda sem função publicada.', nunca: 'Ainda não atua.', c: 17.5, r: 34.35 },
     { room: 'brev', name: 'Guard AI', role: 'em breve', breve: true, sit: 'Em breve', cuida: 'Ainda sem função publicada.', nunca: 'Ainda não atua.', c: 16.5, r: 35.35 },
-    { room: 'marca', name: 'Dyna 2.0', role: 'agente-chefe da Dynamo Wear', chefe: true, tom: '#ff7a1a', sit: 'Chefe do setor', cuida: 'O setor Dynamo Wear e a fila do time.', nunca: 'Mostra dado de afiliado, cupom, pedido ou valor.', c: 5.5, r: 42.35 },
-    { room: 'marca', name: 'Afiliados', role: 'cadastro de afiliados', proposta: true, sit: 'Proposta', cuida: 'O cadastro de afiliados: status e aprovação.', nunca: 'Expõe nome, contato ou chave de pagamento.', desk: [2, 40], c: 2.5, r: 41.4 },
-    { room: 'marca', name: 'Cupons', role: 'cupons da loja', proposta: true, sit: 'Proposta', cuida: 'O cupom ligado ao afiliado e o desconto na loja.', nunca: 'Cria um cupom real nem mostra código.', desk: [9, 40], c: 9.5, r: 41.4 },
-    { room: 'wped', name: 'Pedidos', role: 'pedidos da loja', proposta: true, sit: 'Proposta', cuida: 'O pedido da loja atribuído a um afiliado.', nunca: 'Mostra pedido, cliente ou valor.', desk: [14, 40], c: 15.5, r: 41.4 },
-    { room: 'wcom', name: 'Comissões', role: 'comissão e saque', proposta: true, sit: 'Proposta', cuida: 'A comissão da venda e o pedido de saque.', nunca: 'Paga. Dinheiro nunca passa do nível 2.', desk: [2, 47], c: 4.5, r: 48.35 },
-    { room: 'wcon', name: 'Conteúdo', role: 'presença de creator', proposta: true, sit: 'Proposta', cuida: 'A presença de creator no perfil do afiliado.', nunca: 'Publica peça nem cita creator real.', desk: [11, 47], c: 14.5, r: 48.35 }
+    { room: 'marca', name: 'Dyna 2.0', role: 'agente-chefe da Dynamo Wear', chefe: true, tom: '#ff7a1a', sit: 'Em teste', cuida: 'A venda com teto de desconto, o checkout, a aprovação de afiliado, o cupom de parceiro e a qualificação do lead. Em teste, fala só com o time.', nunca: 'Amplia o teste antes de fechar a conversa e a verificação do webhook. Não dá desconto fora da regra. Não fala com cliente enquanto o teste não abrir.', c: 5.5, r: 42.35 },
+    { room: 'marca', name: 'Funil Vendas', papel: 'Vendas no WhatsApp', role: 'venda no WhatsApp', sit: 'No ar', cuida: 'A venda no WhatsApp: funil por etapas, catálogo, checkout, cupom de primeira compra e a retomada de quem parou.', nunca: 'Transfere para uma pessoa sem resumo. Não cria cupom fora da primeira compra.', desk: [2, 40], c: 2.5, r: 41.4 },
+    { room: 'marca', name: 'Dyna Grupos', papel: 'Grupos', role: 'grupos de creators e sócios', sit: 'Ativo, sem uso', cuida: 'Comandos nos grupos de creators e sócios.', nunca: 'Atende cliente no privado. Não registra uso que não houve.', desk: [9, 40], c: 9.5, r: 41.4 },
+    { room: 'wped', name: 'Afiliados e Creators', papel: 'Portal', role: 'portal do afiliado', sit: 'No ar', cuida: 'O cadastro, a aprovação, a meta de conteúdo e o voucher que a meta gera.', nunca: 'Aprova sem o OK previsto. Não cita creator nem mostra entrega real.', desk: [14, 40], c: 15.5, r: 41.4 },
+    { room: 'wped', name: 'Cupons', papel: 'Cupom e reconciliação', role: 'cupom na loja', sit: 'No ar', cuida: 'O cupom do afiliado na Shopify e na Yampi, e a reconciliação diária.', nunca: 'Cria cupom sem OK. Não mostra código.', desk: [17, 42], c: 16.5, r: 42.35 },
+    { room: 'wcom', name: 'Financeiro Dynamo', papel: 'Pedidos e conciliação', role: 'pedidos e conciliação', sit: 'No ar (manual)', cuida: 'A entrada do pedido, a competência e a conciliação. O passo é manual.', nunca: 'Paga. Dinheiro nunca passa do nível 2. Não concilia sozinho.', desk: [2, 47], c: 4.5, r: 48.35 },
+    { room: 'wcon', name: 'Produção e Estoque', papel: 'Inventário', role: 'inventário e produção', sit: 'No ar', cuida: 'O inventário e o quadro de produção.', nunca: 'Cita cliente ou pedido real. Não move o quadro fora do que o pedido já disparou.', desk: [11, 47], c: 12.5, r: 48.35 },
+    { room: 'wsaida', name: 'Saída de Parceiro', papel: 'Proposta', role: 'encerramento de parceiro', proposta: true, breve: true, sit: 'Proposta', cuida: 'O encerramento de parceiro, quando existir.', nunca: 'Ainda não atua. Não rescinde contrato.', c: 16.5, r: 48.35 }
   ];
 
   const W = new Uint8Array(COLS * ROWS);
@@ -128,7 +131,8 @@
   fill(13, 40, 18, 43);
   fill(1, 45, 18, 45);
   fill(1, 47, 8, 49);
-  fill(10, 47, 18, 49);
+  fill(10, 47, 14, 49);
+  fill(16, 47, 18, 49);
   for (const [c, r] of PORTAS) mark(c, r, 1);
   const BLOQUEIOS = [[7, 1], [8, 1], [9, 1], [10, 1], [8, 0], [9, 0], [12, 14], [13, 14], [11, 15], [17, 15], [18, 15], [16, 15], [18, 14], [1, 9], [11, 9], [18, 7], [1, 13], [4, 15], [6, 13], [3, 21], [4, 21], [5, 21], [4, 22], [5, 22], [6, 40], [7, 40]];
   for (const a of RAW) if (a.desk) BLOQUEIOS.push(a.desk);
@@ -146,7 +150,7 @@
     if (!livre(a.c, a.r)) erros.push(a.name + ' em célula fechada');
     if (a.desk && livre(a.desk[0], a.desk[1])) erros.push(a.name + ' mesa aberta');
     return {
-      roomId: a.room, room: rm, name: a.name, id: slug(a.name), role: a.role,
+      roomId: a.room, room: rm, name: a.name, id: slug(a.name), role: a.role, papel: a.papel || '',
       coord: !!a.coord, shield: !!a.shield, bot: !!a.bot, ceo: !!a.ceo, desk: a.desk || null,
       destaque: !!a.destaque, brief: !!a.brief, breve: !!a.breve, chefe: !!a.chefe, proposta: !!a.proposta, tom: a.tom || '',
       sit: a.sit || '', nivel: a.nivel || (a.cuida ? 'não marcado' : ''),
@@ -431,12 +435,13 @@
     'Revisor': 'A revisão ilustrativa da esteira está na fila.',
     'Sentinela Esteira': 'O passo ilustrativo de publicação foi observado.',
     'Gauntlet': 'A prova ilustrativa ao lado do Estaleiro terminou.',
-    'Dyna 2.0': 'O setor ilustrativo da Dynamo Wear tem um aviso.',
-    Afiliados: 'Um cadastro ilustrativo de afiliado espera leitura.',
-    Cupons: 'Um cupom ilustrativo da loja espera revisão.',
-    Pedidos: 'Um pedido ilustrativo da loja foi atribuído.',
-    'Comissões': 'Uma comissão ilustrativa espera aprovação. Dinheiro não passa do nível 2.',
-    'Conteúdo': 'Uma peça ilustrativa de creator ficou no rascunho.'
+    'Dyna 2.0': 'O teste ilustrativo do setor pediu uma leitura.',
+    'Funil Vendas': 'Uma conversa ilustrativa de venda pediu retomada.',
+    'Afiliados e Creators': 'Um cadastro ilustrativo espera aprovação.',
+    Cupons: 'A reconciliação ilustrativa de cupons fechou o dia.',
+    'Financeiro Dynamo': 'Uma conciliação ilustrativa espera o passo manual. Dinheiro não passa do nível 2.',
+    'Produção e Estoque': 'O quadro ilustrativo de produção mudou de etapa.',
+    'Dyna Grupos': 'Um comando ilustrativo de grupo ficou sem uso.'
   };
   function tickDemo(dt) {
     demoEm -= dt;
@@ -890,7 +895,7 @@
       if (!visivel(a)) continue;
       const feet = project(a.c, a.r, 0);
       const s = toScreen(feet.x, feet.y - (a.altoRobo ? a.altoRobo + 22 : 78));
-      const extra = a.ceo ? ' · você' : a.breve ? ' · em breve' : (a.coord || a.bot ? ' ★' : '') + (a.shield ? ' 🛡' : '');
+      const extra = a.ceo ? ' · você' : a.proposta ? ' · proposta' : a.breve ? ' · em breve' : (a.coord || a.bot ? ' ★' : '') + (a.shield ? ' 🛡' : '');
       const label = (a.ceo ? a.nome : a.name) + extra;
       const w = Math.min(220, ctx.measureText(label).width + (a.status ? 22 : 14));
       let y = s.y;
@@ -1083,7 +1088,7 @@
     h.id = 'card-nome';
     h.textContent = (a.ceo ? a.nome : a.name) + (a.coord ? ' ★' : '') + (a.shield ? ' 🛡' : '');
     const papel = document.createElement('p'); papel.className = 'papel';
-    papel.textContent = a.ceo ? 'CEO' : a.bot ? 'CTO' : a.chefe ? 'Chefe da Dynamo Wear' : a.proposta ? 'Proposta' : a.destaque ? 'Carro-chefe' : a.name === 'Dina' ? 'Agenda e rotina' : a.brief ? 'Ponte de gestão' : a.breve ? 'Em breve' : a.coord ? 'Coordenador' : a.shield ? 'Segurança' : 'Agente';
+    papel.textContent = a.ceo ? 'CEO' : a.bot ? 'CTO' : a.chefe ? 'Chefe da Dynamo Wear' : a.papel ? a.papel : a.proposta ? 'Proposta' : a.destaque ? 'Carro-chefe' : a.name === 'Dina' ? 'Agenda e rotina' : a.brief ? 'Ponte de gestão' : a.breve ? 'Em breve' : a.coord ? 'Coordenador' : a.shield ? 'Segurança' : 'Agente';
     const area = document.createElement('p'); area.className = 'area';
     const dot = document.createElement('span'); dot.className = 'ponto'; dot.style.background = a.room.col;
     area.append(dot, document.createTextNode(a.room.sub ? a.room.name + ' · ' + a.room.sub : a.room.name));
@@ -1244,8 +1249,14 @@
       agents.filter((a) => a.roomId === id).forEach((a) => linha(a.breve ? 'n3 breve' : 'n3', a.name, a));
     }
     linha('n1', 'Dynamo Wear', null, () => setFocus('wear'));
-    linha('n2', 'Dyna 2.0 · chefe', achar('Dyna 2.0'));
-    for (const nome of ['Afiliados', 'Cupons', 'Pedidos', 'Comissões', 'Conteúdo']) linha('n3', nome + ' · proposta', achar(nome));
+    linha('n2', 'Dyna 2.0 · em teste', achar('Dyna 2.0'));
+    linha('n3', 'Funil Vendas · no ar', achar('Funil Vendas'));
+    linha('n3', 'Afiliados e Creators · no ar', achar('Afiliados e Creators'));
+    linha('n3', 'Cupons · no ar', achar('Cupons'));
+    linha('n3', 'Financeiro Dynamo · manual', achar('Financeiro Dynamo'));
+    linha('n3', 'Produção e Estoque · no ar', achar('Produção e Estoque'));
+    linha('n3', 'Dyna Grupos · sem uso', achar('Dyna Grupos'));
+    linha('n3 breve', 'Saída de Parceiro · proposta', achar('Saída de Parceiro'));
   }
   montarArvore();
 

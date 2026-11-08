@@ -78,3 +78,30 @@ Com a sessão criada nessa origem, `/` mostra o escritório. `Sair` posta em
 `node workai/dev-server.mjs` escuta só em `127.0.0.1`. Não é o login de produção: não envia
 código, não usa o segredo do painel e não serve o resto do repositório. Qualquer código de
 6 dígitos, depois de pedir o envio, abre uma sessão local. Não publicar esse processo.
+O preview responde `GET /admin/auth/conta/eu` só com `{ "nome": "Daniel" }`, para o escritório
+mostrar o primeiro nome. Não devolve e-mail nem telefone.
+
+## Avisos dos agentes (`notify`)
+
+As falas de hoje são eventos ilustrativos, marcados como `demo`, sorteados no próprio
+navegador. Não há consulta a sistema real e não há envio para fora: nenhum `fetch`
+de aviso, nenhum webhook.
+
+O ponto de integração, já exposto na página, é:
+
+```js
+WorkAI.notify(agentId, texto)
+WorkAI.notify(agentId, texto, { demo: true })
+```
+
+- `agentId` é o nome do agente (`"Zia"`, `"Dyno Bot"`) ou o mesmo nome sem acento e em
+  minúsculas (`zia`, `dyno-bot`). O avatar do CEO não recebe aviso.
+- `texto` é uma frase curta, no máximo 160 caracteres. Não coloque dado de cliente,
+  chave, token, senha ou IP.
+- O agente interrompe a rotina, calcula o caminho até a posição atual de quem está
+  no avatar (e recalcula se a pessoa andar) e, ao chegar, mostra um balão com ícone
+  de aviso. O clique abre o card com a mensagem. Fechar ou Dispensar devolve o agente
+  à rotina.
+- `{ demo: false }` fica reservado para quando a origem deixar de ser demonstração.
+  Enquanto for ensaio, omita a opção ou use `demo: true` (é o padrão).
+- `notify` só enfileira na página aberta. Não grava nada e não chama a rede.

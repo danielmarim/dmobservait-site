@@ -96,6 +96,11 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(303, cabecalhos({ location: '/admin/login', 'set-cookie': `${COOKIE}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0` }));
       return res.end();
     }
+    if (req.method === 'GET' && path === '/admin/auth/conta/eu') {
+      if (!sessaoOk(req)) { res.writeHead(401, cabecalhos({ 'content-type': 'application/json; charset=utf-8' })); return res.end('{}'); }
+      res.writeHead(200, cabecalhos({ 'content-type': 'application/json; charset=utf-8' }));
+      return res.end(JSON.stringify({ nome: 'Daniel' }));
+    }
     if (req.method === 'GET' && path === '/admin/auth/inicio') {
       res.writeHead(302, cabecalhos({ location: sessaoOk(req) ? '/' : '/admin/login' }));
       return res.end();

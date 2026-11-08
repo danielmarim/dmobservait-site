@@ -18,18 +18,22 @@
       <p>Escritório virtual dos agentes · DM ObservaIT</p>
     </div>
   </div>
-  <form method="post" action="/admin/auth/sair"><button class="sair" type="submit">Sair</button></form>
+  <div class="acoes">
+    <button type="button" class="sair" id="centralizar">Centralizar</button>
+    <form method="post" action="/admin/auth/sair"><button class="sair" type="submit">Sair</button></form>
+  </div>
 </header>
 <nav class="salas" id="salas" aria-label="Salas do escritório"></nav>
 <div class="corpo">
   <div class="palco" id="palco">
-    <canvas id="c" aria-label="Escritório isométrico dos agentes. Escolha um agente para ver a área, o papel e a quem responde."></canvas>
+    <canvas id="c" aria-label="Escritório isométrico. Setas, WASD ou toque no chão para andar. Perto de um agente, Falar abre o card."></canvas>
+    <p class="dica">Setas, WASD ou toque no chão para andar.</p>
     <p class="selo">status ilustrativo</p>
   </div>
   <aside>
     <h2>Hierarquia</h2>
     <div class="arvore" id="arvore"></div>
-    <p class="nota">★ coordenador · escudo de segurança. Avatares andando até a mesa do coordenador mostram o fluxo de tarefas. Os status são ilustrativos.</p>
+    <p class="nota">★ coordenador · escudo de segurança. O fluxo é Daniel → Dyno Bot (CTO) → coordenador → equipe. Os agentes circulam pela mesa, a Copa, a Descompressão e a Diretoria. Um aviso (demo) faz o agente vir até você. Daniel não tem status de agente. Os status são ilustrativos.</p>
   </aside>
 </div>
 <div id="card" hidden role="dialog" aria-modal="false" aria-labelledby="card-nome">

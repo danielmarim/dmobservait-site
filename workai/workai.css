@@ -108,7 +108,9 @@ aside {
 aside h2 { margin: 0 0 10px; font-size: 15px; color: var(--gold); }
 .arvore { font-size: 13px; }
 .arvore button, .arvore .fixo {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   width: 100%;
   text-align: left;
   background: none;
@@ -116,6 +118,11 @@ aside h2 { margin: 0 0 10px; font-size: 15px; color: var(--gold); }
   color: inherit;
   padding: 3px 0 3px 12px;
   border-radius: 6px;
+}
+.arvore .rosto {
+  width: 24px; height: 24px; flex: none;
+  border-radius: 7px; object-fit: cover;
+  background: #10141c;
 }
 .arvore button:hover { background: rgba(255, 255, 255, .05); }
 .arvore .n0 { padding-left: 0; font-weight: 700; }
@@ -147,8 +154,14 @@ aside h2 { margin: 0 0 10px; font-size: 15px; color: var(--gold); }
   position: absolute; right: 6px; top: 2px;
   border: 0; background: none; font-size: 22px; line-height: 1; color: #1b1f2e; padding: 4px 8px;
 }
-#card h3 { margin: 0 28px 4px 0; font-size: 18px; }
+#card .cabeca { display: flex; align-items: center; gap: 10px; margin: 0 22px 8px 0; }
+#card .rosto {
+  width: 68px; height: 68px; flex: none; object-fit: cover;
+  border-radius: 16px; background: #10141c; border: 2px solid #1b1f2e;
+}
+#card h3 { margin: 0 0 2px; font-size: 18px; }
 #card .papel { margin: 0 0 8px; font-weight: 700; }
+#card .cabeca .papel { margin: 0; }
 #card p { margin: 0 0 8px; }
 #card .area { display: flex; align-items: center; gap: 8px; font-weight: 650; }
 #card small { color: #555; }

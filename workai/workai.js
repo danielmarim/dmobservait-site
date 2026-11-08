@@ -146,6 +146,28 @@
   for (const [id, lista] of Object.entries(VAGAS)) for (const [c, r] of lista) if (!livre(c, r)) erros.push('vaga ' + id + ' ' + c + ',' + r);
   if (erros.length) console.warn('WorkAI mapa', erros.join('; '));
 
+  // O robô verde é só o Dyno AI. O Dyno Bot (CTO) continua o holograma com coroa.
+  const ROBOS = {
+    'Dyno AI': { cor: '#3ddc97', base: '/workai/assets/avatares/dyno', alto: 98 },
+    Dina: { cor: '#ff4fa3', base: '/workai/assets/avatares/dina', alto: 90 }
+  };
+  const carregarImg = (src) => {
+    if (typeof Image !== 'function') return null;
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = src;
+    return img;
+  };
+  for (const a of agents) {
+    const r = ROBOS[a.name];
+    if (!r) continue;
+    a.corRobo = r.cor;
+    a.altoRobo = r.alto;
+    a.busto = r.base + '-busto.webp';
+    a.sprite512 = carregarImg(r.base + '-512.webp');
+    a.sprite256 = carregarImg(r.base + '-256.webp');
+  }
+
   const player = agents.find((a) => a.ceo);
   const achar = (id) => {
     const k = String(id || '').trim();
@@ -639,7 +661,41 @@
     seta([pos('Vigia'), pos('Fix AI'), est], '#3ec6e0');
     seta([pos('Brief AI'), project(7.5, 19.2, 3)], '#f0d78c');
   }
+  function spriteRobo(a) {
+    const pref = viewW < 720 ? a.sprite256 : a.sprite512;
+    const alt = viewW < 720 ? a.sprite512 : a.sprite256;
+    if (pref && pref.complete && pref.naturalWidth) return pref;
+    if (alt && alt.complete && alt.naturalWidth) return alt;
+    return null;
+  }
+  function desenharRobo(a, walking) {
+    const img = spriteRobo(a);
+    if (!img) return false;
+    const feet = project(a.c, a.r, 0);
+    const bob = reduce ? 0 : walking ? Math.abs(Math.sin(t / 140)) * 3.2 : Math.sin(t / 700 + a.ph) * 1.3;
+    const sway = walking && !reduce ? Math.sin(t / 160) * 0.055 : 0;
+    const alto = a.altoRobo;
+    const larg = alto * (img.naturalWidth / img.naturalHeight);
+    ctx.save();
+    ctx.translate(feet.x, feet.y);
+    ellipse(0, 3, a.destaque ? 20 : 16, 7, 'rgba(0,0,0,.32)');
+    if (!reduce) {
+      ctx.strokeStyle = a.corRobo;
+      ctx.globalAlpha = 0.95;
+      ctx.lineWidth = a.destaque ? 2.6 : 2;
+      ctx.beginPath();
+      ctx.ellipse(0, 3, a.destaque ? 22 : 17, 8, 0, 0, 7);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+    ctx.translate(0, -bob);
+    ctx.rotate(sway);
+    ctx.drawImage(img, -larg / 2, -alto + 8, larg, alto);
+    ctx.restore();
+    return true;
+  }
   function drawAgent(a, walking) {
+    if (desenharRobo(a, walking)) return;
     const feet = project(a.c, a.r, 0);
     const bob = reduce ? 0 : walking ? Math.abs(Math.sin(t / 120)) * 2 : Math.sin(t / 700 + a.ph) * 1.4;
     const x = feet.x, y = feet.y - bob;
@@ -758,7 +814,7 @@
     for (const a of agents.slice().sort((a, b) => a.r - b.r)) {
       if (!visivel(a)) continue;
       const feet = project(a.c, a.r, 0);
-      const s = toScreen(feet.x, feet.y - 78);
+      const s = toScreen(feet.x, feet.y - (a.altoRobo ? a.altoRobo + 22 : 78));
       const extra = a.ceo ? ' · você' : a.breve ? ' · em breve' : (a.coord || a.bot ? ' ★' : '') + (a.shield ? ' 🛡' : '');
       const label = (a.ceo ? a.nome : a.name) + extra;
       const w = Math.min(220, ctx.measureText(label).width + (a.status ? 22 : 14));
@@ -766,8 +822,8 @@
       for (const p of placed) if (Math.abs(p.x - s.x) < (p.w + w) / 2 && Math.abs(p.y - y) < 18) y = p.y - 18;
       placed.push({ x: s.x, y, w });
       const hot = hover === a;
-      const claro = hot || a.ceo || a.destaque;
-      const borda = a.ceo ? '#e2c27a' : a.destaque ? '#8fd46a' : a.room.col;
+      const claro = hot || a.ceo || a.destaque || a.name === 'Dina';
+      const borda = a.ceo ? '#e2c27a' : a.name === 'Dina' ? '#ff4fa3' : a.destaque ? '#3ddc97' : a.room.col;
       rr(s.x - w / 2, y - 10, w, 20, 8, claro ? '#fffdf6' : 'rgba(8,10,16,.88)', borda);
       ctx.fillStyle = claro ? '#1b1f2e' : '#fff';
       ctx.fillText(label, s.x + (a.status ? 4 : 0), y);
@@ -797,7 +853,7 @@
   }
   function porBalao(a, tipo) {
     const feet = project(a.c, a.r, 0);
-    const s = toScreen(feet.x, feet.y - 122);
+    const s = toScreen(feet.x, feet.y - 122 - (a.altoRobo ? 36 : 0));
     ctx.font = '700 12px system-ui,sans-serif';
     const texto = tipo === 'aviso' ? 'aviso' : 'Falar';
     const w = ctx.measureText(texto).width + 28;
@@ -951,11 +1007,24 @@
     h.id = 'card-nome';
     h.textContent = (a.ceo ? a.nome : a.name) + (a.coord ? ' ★' : '') + (a.shield ? ' 🛡' : '');
     const papel = document.createElement('p'); papel.className = 'papel';
-    papel.textContent = a.ceo ? 'CEO' : a.bot ? 'CTO' : a.destaque ? 'Carro-chefe' : a.brief ? 'Ponte de gestão' : a.breve ? 'Em breve' : a.coord ? 'Coordenador' : a.shield ? 'Segurança' : 'Agente';
+    papel.textContent = a.ceo ? 'CEO' : a.bot ? 'CTO' : a.destaque ? 'Carro-chefe' : a.name === 'Dina' ? 'Agenda e rotina' : a.brief ? 'Ponte de gestão' : a.breve ? 'Em breve' : a.coord ? 'Coordenador' : a.shield ? 'Segurança' : 'Agente';
     const area = document.createElement('p'); area.className = 'area';
     const dot = document.createElement('span'); dot.className = 'ponto'; dot.style.background = a.room.col;
     area.append(dot, document.createTextNode(a.room.sub ? a.room.name + ' · ' + a.room.sub : a.room.name));
-    corpo.append(h, papel, area);
+    const cab = document.createElement('div');
+    cab.className = 'cabeca';
+    if (a.busto) {
+      const foto = document.createElement('img');
+      foto.className = 'rosto';
+      foto.alt = '';
+      foto.src = a.busto;
+      if (a.corRobo) foto.style.borderColor = a.corRobo;
+      cab.append(foto);
+    }
+    const textos = document.createElement('div');
+    textos.append(h, papel);
+    cab.append(textos);
+    corpo.append(cab, area);
     const campo = (rotulo, texto) => {
       if (!texto) return;
       const p = document.createElement('p');
@@ -1065,7 +1134,14 @@
     const linha = (cls, texto, agente, aoClicar) => {
       const el = aoClicar || agente ? document.createElement('button') : document.createElement('div');
       el.className = cls; if (el.tagName === 'BUTTON') el.type = 'button';
-      el.textContent = texto;
+      if (agente?.busto) {
+        const foto = document.createElement('img');
+        foto.className = 'rosto';
+        foto.alt = '';
+        foto.src = agente.busto;
+        el.append(foto);
+      }
+      el.append(document.createTextNode(texto));
       if (aoClicar) el.addEventListener('click', aoClicar);
       else if (agente) el.addEventListener('click', () => abrir(agente, el.getBoundingClientRect()));
       arvore.append(el);
@@ -1142,12 +1218,16 @@
       }
       demoEm = 1e15;
     },
-    card: (nome) => {
+    card: (nome, x, y) => {
       const a = nome === 'Daniel' || nome === player.nome ? player : achar(nome);
       if (!a) return '';
-      abrir(a, { x: 640, y: 120 });
+      abrir(a, { x: x == null ? 640 : x, y: y == null ? 120 : y });
       return document.getElementById('card-corpo').textContent;
     },
+    robosProntos: () => ['Dyno AI', 'Dina'].every((n) => {
+      const a = achar(n);
+      return !!(a && spriteRobo(a));
+    }),
     fluxos: (v) => {
       fluxos = !!v;
       const b = document.getElementById('fluxos');

@@ -28,8 +28,14 @@
 <nav class="salas" id="salas" aria-label="Salas do escritório"></nav>
 <div class="corpo">
   <div class="palco" id="palco">
-    <canvas id="c" aria-label="Escritório isométrico. Setas, WASD ou toque no chão para andar. Perto de um agente, Falar abre o card."></canvas>
-    <p class="dica">Setas, WASD ou toque no chão para andar.</p>
+    <canvas id="c" aria-label="Escritório isométrico. Setas, WASD ou toque no chão para andar. Clique num agente para abrir o chat. Roda do mouse ou pinça para zoom."></canvas>
+    <div class="zoom-bar" role="group" aria-label="Zoom do mapa">
+      <button type="button" id="zoom-out" title="Afastar" aria-label="Afastar">−</button>
+      <span id="zoom-lbl">100%</span>
+      <button type="button" id="zoom-in" title="Aproximar" aria-label="Aproximar">+</button>
+      <button type="button" id="zoom-reset" title="Centralizar e zoom 100%" aria-label="Centralizar mapa">⌖</button>
+    </div>
+    <p class="dica">Setas, WASD ou toque no chão. Roda/pinça ou +/− para zoom. Clique num agente para conversar.</p>
     <p class="selo">status ilustrativo</p>
   </div>
   <a class="powered" href="https://dmobservait.com">Powered by<img src="/workai/assets/observait-logo.png" alt="ObservaIT, ecossistema de tecnologia" width="249" height="61"></a>
@@ -44,13 +50,48 @@
     <p class="regra">Dinheiro nunca passa do nível 2.</p>
     <h2>Hierarquia</h2>
     <div class="arvore" id="arvore"></div>
-    <p class="nota">Daniel (CEO) fica acima do Dyno Bot (CTO) e da Dyna 2.0, chefe da Dynamo Wear. A Operação Dyno responde à Diretoria pelo Brief AI. A saída de parceiro é proposta e fica esmaecida. ★ coordenador · escudo de segurança. Um aviso (demo) faz o agente vir até você. Os status são ilustrativos.</p>
+    <p class="nota">Daniel (CEO) fica acima do Dyno Bot (CTO) e da Dyna 2.0, chefe da Dynamo Wear. A Operação Dyno responde à Diretoria pelo Brief AI. A saída de parceiro é proposta e fica esmaecida. ★ coordenador · escudo de segurança. Um aviso (demo) faz o agente vir até você. Os status são ilustrativos. O chat desta rodada só guarda histórico no navegador.</p>
   </aside>
 </div>
+
 <div id="card" hidden role="dialog" aria-modal="false" aria-labelledby="card-nome">
   <button type="button" id="card-fechar" aria-label="Fechar">×</button>
   <div id="card-corpo"></div>
 </div>
+
+<aside id="chat" class="chat" hidden role="dialog" aria-modal="true" aria-labelledby="chat-nome">
+  <header class="chat-topo">
+    <div>
+      <p class="chat-eyebrow">Conversa local</p>
+      <h2 id="chat-nome">Agente</h2>
+    </div>
+    <div class="chat-topo-acoes">
+      <button type="button" id="chat-ficha" class="chat-sec">Ficha</button>
+      <button type="button" id="chat-fechar" aria-label="Fechar chat">×</button>
+    </div>
+  </header>
+  <p class="chat-aviso" role="status">Ainda não conectado aos agentes. Nada sai deste navegador. Histórico só em localStorage.</p>
+  <div id="chat-hist" class="chat-hist" aria-live="polite"></div>
+  <div class="chat-atalhos" aria-label="Atalhos de comando">
+    <button type="button" data-cmd="status">status</button>
+    <button type="button" data-cmd="o que está fazendo">o que está fazendo</button>
+    <button type="button" data-cmd="nova tarefa">nova tarefa</button>
+  </div>
+  <form id="chat-form" class="chat-form" autocomplete="off">
+    <label class="sr-only" for="chat-input">Mensagem</label>
+    <input id="chat-input" type="text" maxlength="500" placeholder="Escreva um pedido ou comando…" enterkeyhint="send">
+    <button type="submit">Enviar</button>
+  </form>
+</aside>
+
+<aside id="ssh-panel" class="ssh" hidden role="dialog" aria-modal="true" aria-labelledby="ssh-titulo">
+  <header class="ssh-topo">
+    <h2 id="ssh-titulo">PC da Diretoria · SSH</h2>
+    <button type="button" id="ssh-fechar" aria-label="Fechar">×</button>
+  </header>
+  <p>Terminal remoto ainda não ligado. A proposta está em <code>workai/SSH-PROPOSTA.md</code>. Sem chave no front, sem túnel nesta rodada.</p>
+</aside>
+
 <script src="/workai/workai.js" defer></script>
 </body>
 </html>

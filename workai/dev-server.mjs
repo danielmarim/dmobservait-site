@@ -111,6 +111,10 @@ const server = http.createServer(async (req, res) => {
       if (!sessaoOk(req)) { res.writeHead(401, cabecalhos()); return res.end(); }
       return enviarArquivo(res, path.slice(1));
     }
+    if ((req.method === 'GET' || req.method === 'HEAD') && /^\/workai\/assets\/marcas\/[a-z0-9._-]+\.(png|svg|webp)$/.test(path)) {
+      if (!sessaoOk(req)) { res.writeHead(401, cabecalhos()); return res.end(); }
+      return enviarArquivo(res, path.slice(1));
+    }
     if (PROTEGIDOS.has(path) && (req.method === 'GET' || req.method === 'HEAD')) {
       if (!sessaoOk(req)) {
         if (querHtml(req)) { res.writeHead(302, cabecalhos({ location: '/admin/login' })); return res.end(); }

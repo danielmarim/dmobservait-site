@@ -70,6 +70,7 @@ Conferir, sem cookie:
 - a página de login é a mesma do painel
 - `/workai/workai.js` sem sessão → 401
 - `/workai/assets/avatares/*.webp` sem sessão → 401 (o Daniel, a Dyna 2.0 e os robôs oficiais do Dyno AI e da Dina)
+- `/workai/assets/observait-logo.png` responde sem sessão: o selo “Powered by” da tela de login. O `default.conf` libera só esse arquivo; o resto de `/workai/` no site público continua 404.
 
 Com a sessão criada nessa origem, `/` mostra o escritório. `Sair` posta em
 `/admin/auth/sair` e volta para `/admin/login`.

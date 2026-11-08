@@ -23,7 +23,8 @@ const PUBLICOS = new Map([
   ['/admin/login/login.css', 'admin/login/login.css'],
   ['/admin/login/login.js', 'admin/login/login.js'],
   ['/styles.css', 'styles.css'],
-  ['/favicon.svg', 'favicon.svg']
+  ['/favicon.svg', 'favicon.svg'],
+  ['/workai/assets/observait-logo.png', 'workai/assets/observait-logo.png']
 ]);
 const PROTEGIDOS = new Map([
   ['/', 'workai/index.html'],
@@ -31,7 +32,7 @@ const PROTEGIDOS = new Map([
   ['/workai/workai.js', 'workai/workai.js'],
   ['/workai/workai.css', 'workai/workai.css']
 ]);
-const TIPOS = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.svg': 'image/svg+xml', '.webp': 'image/webp' };
+const TIPOS = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png' };
 
 const arquivo = (rel) => {
   const p = normalize(join(ROOT, rel));

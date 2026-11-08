@@ -2,9 +2,9 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>WorkAI · Escritório virtual | DM ObservaIT</title>
-<meta name="description" content="Escritório virtual dos agentes de IA da DM ObservaIT. Os status são ilustrativos.">
+<meta name="description" content="Escritório virtual estilo Gather dos agentes de IA da DM ObservaIT. Arte e código originais. Status ilustrativos.">
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/workai/workai.css">
@@ -15,31 +15,30 @@
     <span class="losango" aria-hidden="true"></span>
     <div>
       <h1>Work<span>AI</span></h1>
-      <p>Escritório virtual dos agentes · DM ObservaIT</p>
+      <p>Escritório virtual · DM ObservaIT</p>
     </div>
   </div>
-  <div class="acoes">
-    <button type="button" class="sair" id="centralizar">Centralizar</button>
-    <button type="button" class="sair" id="fluxos" aria-pressed="false">Fluxos</button>
-    <button type="button" class="sair" id="para-salas" title="Mandar todos de volta às mesas">Todos para as salas</button>
-    <form method="post" action="/admin/auth/sair"><button class="sair" type="submit">Sair</button></form>
-  </div>
+  <nav class="salas" id="salas" aria-label="Salas do escritório"></nav>
+  <form method="post" action="/admin/auth/sair" class="sair-form"><button class="sair" type="submit">Sair</button></form>
 </header>
-<nav class="salas" id="salas" aria-label="Salas do escritório"></nav>
+
 <div class="corpo">
   <div class="palco" id="palco">
-    <canvas id="c" aria-label="Escritório isométrico. Setas, WASD ou toque no chão para andar. Clique num agente para abrir o chat. Roda do mouse ou pinça para zoom."></canvas>
-    <div class="zoom-bar" role="group" aria-label="Zoom do mapa">
-      <button type="button" id="zoom-out" title="Afastar" aria-label="Afastar">−</button>
-      <span id="zoom-lbl">100%</span>
-      <button type="button" id="zoom-in" title="Aproximar" aria-label="Aproximar">+</button>
-      <button type="button" id="zoom-reset" title="Centralizar e zoom 100%" aria-label="Centralizar mapa">⌖</button>
+    <canvas id="c" aria-label="Escritório visto de cima. Setas ou WASD para andar. Clique no chão para ir até um ponto. Perto de um agente, use Conversar."></canvas>
+    <div id="prox" class="prox" hidden>
+      <button type="button" id="prox-chat">Conversar</button>
+      <button type="button" id="prox-acenar">Acenar</button>
     </div>
-    <p class="dica">Setas, WASD ou toque no chão. Roda/pinça ou +/− para zoom. Clique num agente para conversar.</p>
-    <p class="selo">status ilustrativo</p>
+    <aside id="sala-painel" class="sala-painel" hidden>
+      <p class="sala-eyebrow">Área privada</p>
+      <h2 id="sala-titulo">Sala</h2>
+      <p id="sala-lista" class="sala-lista"></p>
+    </aside>
+    <canvas id="mini" class="minimapa" width="160" height="200" aria-label="Minimapa" hidden></canvas>
+    <p class="selo">status ilustrativo · arte original</p>
   </div>
-  <a class="powered" href="https://dmobservait.com">Powered by<img src="/workai/assets/observait-logo.png" alt="ObservaIT, ecossistema de tecnologia" width="249" height="61"></a>
-  <aside>
+
+  <aside class="lado" id="lado">
     <h2>Níveis de autonomia</h2>
     <ul class="niveis">
       <li><b>0</b> Só lê</li>
@@ -50,9 +49,35 @@
     <p class="regra">Dinheiro nunca passa do nível 2.</p>
     <h2>Hierarquia</h2>
     <div class="arvore" id="arvore"></div>
-    <p class="nota">Daniel (CEO) fica acima do Dyno Bot (CTO) e da Dyna 2.0, chefe da Dynamo Wear. A Operação Dyno responde à Diretoria pelo Brief AI. A saída de parceiro é proposta e fica esmaecida. ★ coordenador · escudo de segurança. Um aviso (demo) faz o agente vir até você. Os status são ilustrativos. O chat desta rodada só guarda histórico no navegador.</p>
+    <p class="nota">Experiência inspirada em escritórios virtuais 2D (Gather), com arte e código próprios. Chat só local. Sem API externa nesta fase.</p>
   </aside>
 </div>
+
+<footer class="barra" id="barra">
+  <div class="barra-eu">
+    <canvas id="eu-face" width="40" height="40" aria-hidden="true"></canvas>
+    <div>
+      <strong id="eu-nome">Daniel</strong>
+      <button type="button" id="status-btn" class="status-btn" title="Mudar status ilustrativo">
+        <span class="dot" id="status-dot"></span>
+        <span id="status-lbl">disponível</span>
+      </button>
+    </div>
+  </div>
+  <div class="barra-acoes">
+    <button type="button" id="btn-acenar" title="Acenar">Acenar</button>
+    <button type="button" id="btn-chat" title="Abrir chat">Chat</button>
+    <button type="button" id="btn-mini" title="Minimapa" aria-pressed="false">Mapa</button>
+    <button type="button" id="btn-foco" title="Modo foco" aria-pressed="false">Foco</button>
+    <button type="button" id="btn-modo-mini" title="Modo mini (só pessoas)" aria-pressed="false">Mini</button>
+    <button type="button" id="zoom-out" aria-label="Afastar">−</button>
+    <span id="zoom-lbl">100%</span>
+    <button type="button" id="zoom-in" aria-label="Aproximar">+</button>
+    <button type="button" id="zoom-reset" title="Centralizar">⌖</button>
+    <button type="button" id="para-salas" title="Mandar todos de volta às mesas">Todos para as salas</button>
+  </div>
+  <a class="powered" href="https://dmobservait.com">Powered by<img src="/workai/assets/observait-logo.png" alt="ObservaIT" width="249" height="61"></a>
+</footer>
 
 <div id="card" hidden role="dialog" aria-modal="false" aria-labelledby="card-nome">
   <button type="button" id="card-fechar" aria-label="Fechar">×</button>

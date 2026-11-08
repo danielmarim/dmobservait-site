@@ -105,3 +105,5 @@ WorkAI.notify(agentId, texto, { demo: true })
 - `{ demo: false }` fica reservado para quando a origem deixar de ser demonstração.
   Enquanto for ensaio, omita a opção ou use `demo: true` (é o padrão).
 - `notify` só enfileira na página aberta. Não grava nada e não chama a rede.
+- A ala Operação Dyno usa o mesmo gancho, pelo nome em tela (`Dyno AI`, `Brief AI`).
+  Partner AI, Ads AI e Guard AI estão em breve: não andam, e `notify` devolve `false`.

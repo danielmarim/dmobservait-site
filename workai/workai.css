@@ -49,7 +49,7 @@ h1 span { color: var(--gold); }
   padding: 6px 14px;
   min-height: 36px;
 }
-.sair:hover { border-color: var(--gold); color: var(--gold); }
+.sair:hover, .sair.is-on { border-color: var(--gold); color: var(--gold); }
 .acoes { display: flex; gap: 8px; align-items: center; flex: none; }
 
 .salas {
@@ -122,13 +122,19 @@ aside h2 { margin: 0 0 10px; font-size: 15px; color: var(--gold); }
 .arvore .n1 { padding-left: 12px; }
 .arvore .n2 { padding-left: 24px; }
 .arvore .n3 { padding-left: 36px; color: var(--mute); }
+.arvore .breve { opacity: .55; }
+.niveis { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.niveis b { display: inline-block; width: 1.2em; color: var(--gold); }
+.regra { margin: 10px 0 16px; font-size: 13px; font-weight: 700; color: #f0d78c; }
 .ponto { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
 .nota { color: var(--mute); font-size: 12px; margin: 12px 0 0; }
 
 #card {
   position: fixed;
   z-index: 5;
-  width: min(300px, calc(100vw - 24px));
+  width: min(340px, calc(100vw - 24px));
+  max-height: min(72vh, 560px);
+  overflow: auto;
   background: #fffdf6;
   color: #1b1f2e;
   border: 3px solid #1b1f2e;

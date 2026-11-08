@@ -20,6 +20,7 @@
   </div>
   <div class="acoes">
     <button type="button" class="sair" id="centralizar">Centralizar</button>
+    <button type="button" class="sair" id="fluxos" aria-pressed="false">Fluxos</button>
     <form method="post" action="/admin/auth/sair"><button class="sair" type="submit">Sair</button></form>
   </div>
 </header>
@@ -31,9 +32,17 @@
     <p class="selo">status ilustrativo</p>
   </div>
   <aside>
+    <h2>Níveis de autonomia</h2>
+    <ul class="niveis">
+      <li><b>0</b> Só lê</li>
+      <li><b>1</b> Sugere</li>
+      <li><b>2</b> Executa com aprovação</li>
+      <li><b>3</b> Executa sozinho no limite</li>
+    </ul>
+    <p class="regra">Dinheiro nunca passa do nível 2.</p>
     <h2>Hierarquia</h2>
     <div class="arvore" id="arvore"></div>
-    <p class="nota">★ coordenador · escudo de segurança. O fluxo é Daniel → Dyno Bot (CTO) → coordenador → equipe. Os agentes circulam pela mesa, a Copa, a Descompressão e a Diretoria. Um aviso (demo) faz o agente vir até você. Daniel não tem status de agente. Os status são ilustrativos.</p>
+    <p class="nota">Daniel (CEO) fica acima do Dyno Bot (CTO). A ala Operação Dyno responde à Diretoria, e o Brief AI é a ponte de gestão. ★ coordenador · escudo de segurança. Um aviso (demo) faz o agente vir até você. Os três esmaecidos estão em breve. Os status são ilustrativos.</p>
   </aside>
 </div>
 <div id="card" hidden role="dialog" aria-modal="false" aria-labelledby="card-nome">

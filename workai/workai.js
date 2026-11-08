@@ -3,24 +3,31 @@
 // chave, token ou IP, e nada é enviado para fora.
 // Integração das falas: WorkAI.notify(agentId, texto, { demo: true }).
 (() => {
-  const COLS = 20, ROWS = 16, TW = 64, TH = 32, WALL = 52;
+  const COLS = 20, ROWS = 36, TW = 64, TH = 32, WALL = 52;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const PASSO = 1000 / 30;
 
   const ROOMS = [
-    { id: 'dir', name: 'Diretoria', short: 'Diretoria', col: '#f0d78c', c: 1, r: 0, w: 18, h: 4, glass: true },
-    { id: 'op', name: 'DM Operação', sub: 'sala do head', short: 'Operação', col: '#e2b657', c: 1, r: 7, w: 4, h: 3 },
-    { id: 'sre', name: 'DM SRE & O11y', short: 'SRE & O11y', col: '#3ec6e0', c: 7, r: 7, w: 5, h: 3 },
-    { id: 'mkt', name: 'Dyno Marketing', short: 'Marketing', col: '#ff6fa8', c: 14, r: 7, w: 5, h: 3 },
-    { id: 'com', name: 'Dyno Comercial', short: 'Comercial', col: '#7dce7a', c: 1, r: 13, w: 4, h: 3 },
-    { id: 'prd', name: 'DM Produto & Receita', short: 'Produto', col: '#b18cff', c: 6, r: 13, w: 4, h: 3 },
-    { id: 'copa', name: 'Copa & Reuniões', short: 'Copa', col: '#e0c080', c: 11, r: 13, w: 4, h: 3 },
-    { id: 'desc', name: 'Sala de Descompressão', short: 'Descompressão', col: '#7ec8c3', c: 16, r: 13, w: 3, h: 3 }
+    { id: 'dir', name: 'Diretoria', short: 'Diretoria', col: '#f0d78c', c: 1, r: 0, w: 18, h: 4, glass: true, ala: 'dm' },
+    { id: 'op', name: 'DM Operação', sub: 'sala do head', short: 'Operação', col: '#e2b657', c: 1, r: 7, w: 4, h: 3, ala: 'dm' },
+    { id: 'sre', name: 'DM SRE & O11y', short: 'SRE & O11y', col: '#3ec6e0', c: 7, r: 7, w: 5, h: 3, ala: 'dm' },
+    { id: 'mkt', name: 'Dyno Marketing', short: 'Marketing', col: '#ff6fa8', c: 14, r: 7, w: 5, h: 3, ala: 'dm' },
+    { id: 'com', name: 'Dyno Comercial', short: 'Comercial', col: '#7dce7a', c: 1, r: 13, w: 4, h: 3, ala: 'dm' },
+    { id: 'prd', name: 'DM Produto & Receita', short: 'Produto', col: '#b18cff', c: 6, r: 13, w: 4, h: 3, ala: 'dm' },
+    { id: 'copa', name: 'Copa & Reuniões', short: 'Copa', col: '#e0c080', c: 11, r: 13, w: 4, h: 3, ala: 'dm' },
+    { id: 'desc', name: 'Sala de Descompressão', short: 'Descompressão', col: '#7ec8c3', c: 16, r: 13, w: 3, h: 3, ala: 'dm' },
+    { id: 'odyn', name: 'Dyno AI', sub: 'carro-chefe', short: 'Dyno AI', col: '#8fd46a', c: 1, r: 21, w: 10, h: 4, glass: true, ala: 'dyno' },
+    { id: 'gab', name: 'Gabinete', short: 'Gabinete', col: '#f0d78c', c: 12, r: 21, w: 7, h: 4, ala: 'dyno' },
+    { id: 'cres', name: 'Crescimento', short: 'Crescimento', col: '#f0a05a', c: 1, r: 27, w: 6, h: 3, ala: 'dyno' },
+    { id: 'cli', name: 'Clientes', short: 'Clientes', col: '#7eb6e0', c: 8, r: 27, w: 6, h: 3, ala: 'dyno' },
+    { id: 'fin', name: 'Finanças', short: 'Finanças', col: '#e2b657', c: 15, r: 27, w: 4, h: 3, ala: 'dyno' },
+    { id: 'tec', name: 'Tecnologia', sub: 'Estaleiro e Esteira', short: 'Tecnologia', col: '#3ec6e0', c: 1, r: 33, w: 12, h: 3, ala: 'dyno' },
+    { id: 'brev', name: 'Em breve', short: 'Em breve', col: '#8a8f99', c: 14, r: 33, w: 5, h: 3, ala: 'dyno', breve: true }
   ];
   const room = (id) => ROOMS.find((r) => r.id === id);
   const salaDe = (c, r) => ROOMS.find((rm) => c >= rm.c && r >= rm.r && c < rm.c + rm.w && r < rm.r + rm.h) || null;
 
-  const PORTAS = [[8, 4], [9, 4], [3, 6], [4, 6], [9, 6], [10, 6], [16, 6], [17, 6], [3, 10], [4, 10], [9, 10], [10, 10], [16, 10], [17, 10], [2, 12], [3, 12], [7, 12], [8, 12], [12, 12], [13, 12], [17, 12]];
+  const PORTAS = [[8, 4], [9, 4], [3, 6], [4, 6], [9, 6], [10, 6], [16, 6], [17, 6], [3, 10], [4, 10], [9, 10], [10, 10], [16, 10], [17, 10], [2, 12], [3, 12], [7, 12], [8, 12], [12, 12], [13, 12], [17, 12], [7, 20], [8, 20], [14, 20], [15, 20], [4, 24], [5, 24], [14, 24], [15, 24], [2, 26], [3, 26], [9, 26], [10, 26], [16, 26], [17, 26], [2, 30], [3, 30], [9, 30], [10, 30], [16, 30], [4, 32], [5, 32], [8, 32], [9, 32], [16, 32]];
   const VAGAS = {
     copa: [[12, 13], [13, 13], [14, 13], [14, 15], [11, 14], [12, 15], [13, 15]],
     desc: [[16, 13], [16, 14], [18, 13], [17, 13], [17, 14]],
@@ -46,7 +53,29 @@
     { room: 'prd', name: 'Produto AI', role: 'PM das duas linhas', coord: true, desk: [7, 13], c: 7.5, r: 14.35 },
     { room: 'prd', name: 'Receita AI', role: 'receita', desk: [9, 13], c: 9.5, r: 14.35 },
     { room: 'prd', name: 'Spend AI', role: 'assinaturas e custos', desk: [6, 15], c: 6.5, r: 14.35 },
-    { room: 'prd', name: 'Sucesso AI', role: 'CS do Business', desk: [8, 15], c: 8.5, r: 14.35 }
+    { room: 'prd', name: 'Sucesso AI', role: 'CS do Business', desk: [8, 15], c: 8.5, r: 14.35 },
+    { room: 'odyn', name: 'Dyno AI', role: 'assistente do produto', destaque: true, tom: '#7dce6a', sit: 'Carro-chefe', cuida: 'Atende quem usa o produto.', nunca: 'Age fora da permissão do produto.', c: 3.5, r: 23.35 },
+    { room: 'odyn', name: 'Dina', role: 'agenda e rotina', tom: '#e48ab0', sit: 'Com o Dyno AI', cuida: 'Agenda, lembretes e rotina.', nunca: 'Decide dinheiro ou publica sozinha.', c: 6.5, r: 23.35 },
+    { room: 'gab', name: 'Brief AI', role: 'ponte de gestão', brief: true, sit: 'No ar', nivel: '0 · só lê', cuida: 'A mensagem das 9h e a fila única de aprovações.', nunca: 'Executa o que está na fila.', desk: [13, 22], c: 14.5, r: 23.35 },
+    { room: 'cres', name: 'Pulse AI', role: 'redes sociais', sit: 'Em parte', nivel: '2 · executa com aprovação', cuida: 'Redes sociais.', nunca: 'Publica sem aprovação.', desk: [2, 27], c: 2.5, r: 28.35 },
+    { room: 'cres', name: 'AI SDR', role: 'leads e atendimento', sit: 'Em parte', nivel: '1 · sugere', cuida: 'Leads e atendimento.', nunca: 'Fecha contrato sozinho.', desk: [4, 27], c: 4.5, r: 28.35 },
+    { room: 'cres', name: 'Closer AI', role: 'comercial', sit: 'A construir', cuida: 'O comercial, quando existir.', nunca: 'Ainda não atua.', desk: [5, 29], c: 6.5, r: 28.35 },
+    { room: 'cli', name: 'Onboard AI', role: 'implantação', sit: 'Em parte', cuida: 'Implantação e o monitor de implantação.', nunca: 'Muda o ambiente sozinho.', desk: [9, 27], c: 9.5, r: 28.35 },
+    { room: 'cli', name: 'Care AI', role: 'pós-venda', sit: 'A construir', cuida: 'O pós-venda, quando existir.', nunca: 'Ainda não atua.', desk: [11, 27], c: 11.5, r: 28.35 },
+    { room: 'cli', name: 'Help AI', role: 'chamados de primeira linha', sit: 'No ar', nivel: '3 · executa sozinho no limite (em dúvida, duplicado)', cuida: 'Chamados de primeira linha.', nunca: 'Fecha o diagnóstico.', desk: [8, 29], c: 8.5, r: 28.35 },
+    { room: 'cli', name: 'Fix AI', role: 'diagnóstico de chamados', sit: 'A construir', cuida: 'O diagnóstico de chamados, quando existir.', nunca: 'Ainda não atua.', desk: [13, 29], c: 12.5, r: 28.35 },
+    { room: 'fin', name: 'Cash AI', role: 'recebimentos, cobrança e caixa', sit: 'Em parte', nivel: '2 · executa com aprovação (teto)', cuida: 'Recebimentos, cobrança e caixa.', nunca: 'Passa dinheiro do nível 2.', desk: [16, 27], c: 17.5, r: 28.35 },
+    { room: 'tec', name: 'Vigia', role: 'observabilidade do ambiente', sit: 'Em parte', nivel: '0 · só lê', cuida: 'A observabilidade do ambiente.', nunca: 'Corrige o que observa.', desk: [2, 33], c: 2.5, r: 34.35 },
+    { room: 'tec', name: 'Insight AI', role: 'qualidade do Dyno AI', sit: 'Em parte', nivel: '1 · sugere', cuida: 'A qualidade do Dyno AI.', nunca: 'Muda o Dyno AI sozinho.', desk: [4, 33], c: 4.5, r: 34.35 },
+    { room: 'tec', name: 'Arquiteto', role: 'desenho da mudança', sit: 'No ar', cuida: 'O desenho da mudança na esteira.', nunca: 'Publica direto.', desk: [6, 33], c: 6.5, r: 34.35 },
+    { room: 'tec', name: 'Construtor', role: 'monta a mudança', sit: 'No ar', cuida: 'Montar a mudança na esteira.', nunca: 'Aprova a própria peça.', desk: [8, 33], c: 8.5, r: 34.35 },
+    { room: 'tec', name: 'Testes', role: 'verifica a mudança', sit: 'No ar', cuida: 'Verificar a mudança.', nunca: 'Publica.', desk: [10, 33], c: 10.5, r: 34.35 },
+    { room: 'tec', name: 'Revisor', role: 'revisa a mudança', sit: 'No ar', cuida: 'Revisar a mudança.', nunca: 'Pula a revisão.', desk: [3, 35], c: 3.5, r: 34.35 },
+    { room: 'tec', name: 'Sentinela Esteira', role: 'vigia a publicação', sit: 'No ar', cuida: 'Vigiar o passo de publicação.', nunca: 'Publica no lugar do revisor.', desk: [7, 35], c: 7.5, r: 34.35 },
+    { room: 'tec', name: 'Gauntlet', role: 'prova ao lado do Estaleiro', sit: 'No ar', cuida: 'A prova ao lado do Estaleiro.', nunca: 'Publica no lugar da esteira.', desk: [12, 33], c: 11.5, r: 35.35 },
+    { room: 'brev', name: 'Partner AI', role: 'em breve', breve: true, sit: 'Em breve', cuida: 'Ainda sem função publicada.', nunca: 'Ainda não atua.', c: 15.5, r: 34.35 },
+    { room: 'brev', name: 'Ads AI', role: 'em breve', breve: true, sit: 'Em breve', cuida: 'Ainda sem função publicada.', nunca: 'Ainda não atua.', c: 17.5, r: 34.35 },
+    { room: 'brev', name: 'Guard AI', role: 'em breve', breve: true, sit: 'Em breve', cuida: 'Ainda sem função publicada.', nunca: 'Ainda não atua.', c: 16.5, r: 35.35 }
   ];
 
   const W = new Uint8Array(COLS * ROWS);
@@ -68,8 +97,22 @@
   fill(6, 13, 9, 15);
   fill(11, 13, 14, 15);
   fill(16, 13, 18, 15);
+  fill(5, 11, 5, 19);
+  fill(10, 11, 10, 19);
+  fill(4, 16, 6, 19);
+  fill(9, 16, 11, 19);
+  fill(1, 19, 18, 19);
+  fill(1, 21, 10, 23);
+  fill(12, 21, 18, 23);
+  fill(1, 25, 18, 25);
+  fill(1, 27, 6, 29);
+  fill(8, 27, 13, 29);
+  fill(15, 27, 18, 29);
+  fill(1, 31, 18, 31);
+  fill(1, 33, 12, 35);
+  fill(14, 33, 18, 35);
   for (const [c, r] of PORTAS) mark(c, r, 1);
-  const BLOQUEIOS = [[7, 1], [8, 1], [9, 1], [10, 1], [8, 0], [9, 0], [12, 14], [13, 14], [11, 15], [17, 15], [18, 15], [16, 15], [18, 14], [1, 9], [11, 9], [18, 7], [1, 13], [4, 15], [6, 13]];
+  const BLOQUEIOS = [[7, 1], [8, 1], [9, 1], [10, 1], [8, 0], [9, 0], [12, 14], [13, 14], [11, 15], [17, 15], [18, 15], [16, 15], [18, 14], [1, 9], [11, 9], [18, 7], [1, 13], [4, 15], [6, 13], [3, 21], [4, 21], [5, 21], [4, 22], [5, 22]];
   for (const a of RAW) if (a.desk) BLOQUEIOS.push(a.desk);
   for (const [c, r] of BLOQUEIOS) mark(c, r, 0);
 
@@ -87,11 +130,14 @@
     return {
       roomId: a.room, room: rm, name: a.name, id: slug(a.name), role: a.role,
       coord: !!a.coord, shield: !!a.shield, bot: !!a.bot, ceo: !!a.ceo, desk: a.desk || null,
+      destaque: !!a.destaque, brief: !!a.brief, breve: !!a.breve, tom: a.tom || '',
+      sit: a.sit || '', nivel: a.nivel || (a.cuida ? 'não marcado' : ''),
+      cuida: a.cuida || '', nunca: a.nunca || '',
       homeC: a.c, homeR: a.r, c: a.c, r: a.r,
-      hair: a.ceo ? '#2a1810' : HAIR[h % HAIR.length],
-      skin: a.ceo ? '#e4b48e' : a.bot ? '#d7f6ff' : SKIN[h % SKIN.length],
+      hair: a.ceo ? '#2a1810' : a.name === 'Dina' ? '#6d3ea3' : HAIR[h % HAIR.length],
+      skin: a.ceo ? '#e4b48e' : a.bot ? '#d7f6ff' : a.name === 'Dina' ? '#f6d0dc' : SKIN[h % SKIN.length],
       hairStyle: a.ceo ? 0 : h % 6, ph: (h % 628) / 100,
-      status: a.ceo ? null : STATUS[h % 4],
+      status: a.ceo || a.breve || rm.ala === 'dyno' ? null : STATUS[h % 4],
       nome: a.ceo ? 'Daniel' : a.name,
       caminho: null, passo: 0, espera: 1200 + (h % 5000), fila: [], missao: null, trava: 0, repath: 0, ultimoAlvo: ''
     };
@@ -111,7 +157,8 @@
   const nomeCeo = () => player.nome || 'Daniel';
   const reportsTo = (a) => {
     if (a.ceo) return '';
-    if (a.bot) return nomeCeo() + ' (CEO)';
+    if (a.bot || a.brief) return nomeCeo() + ' (CEO)';
+    if (a.room?.ala === 'dyno') return 'Brief AI';
     if (a.coord || a.roomId === 'op') return 'Dyno Bot (CTO)';
     return agents.find((x) => x.roomId === a.roomId && x.coord)?.name || 'Dyno Bot (CTO)';
   };
@@ -120,7 +167,8 @@
   const ctx = cvs.getContext('2d');
   const palco = document.getElementById('palco');
   let viewW = 1, viewH = 1, dpr = 1, focusId = '', t = 0, cam = { s: 1, ox: 0, oy: 0 };
-  let mouse = null, hover = null, ready = false, seguir = true, congelado = false, demoEm = 12000;
+  let mouse = null, hover = null, ready = false, seguir = true, congelado = false, demoEm = 12000, fluxos = false;
+  let vista = [0, ROWS - 1];
   const keys = new Set();
   const hits = [];
   const baloes = [];
@@ -283,7 +331,7 @@
   }
   function notify(agentId, texto, opts) {
     const a = achar(agentId);
-    if (!a || a.ceo) return false;
+    if (!a || a.ceo || a.breve) return false;
     const limpo = limparTexto(texto);
     if (!limpo) return false;
     const ev = { texto: limpo, demo: !opts || opts.demo !== false, lida: false, chegou: false };
@@ -318,21 +366,40 @@
     'Receita AI': 'O resumo ilustrativo de receita foi fechado.',
     'Spend AI': 'O resumo ilustrativo de custos foi fechado.',
     'Sucesso AI': 'Um acompanhamento ilustrativo de CS está na fila.',
-    'Dyno Bot': 'Os coordenadores receberam a tarefa ilustrativa.'
+    'Dyno Bot': 'Os coordenadores receberam a tarefa ilustrativa.',
+    'Dyno AI': 'Um atendimento ilustrativo do produto ficou pronto.',
+    'Dina': 'Um lembrete ilustrativo de rotina está na hora.',
+    'Brief AI': 'A fila ilustrativa das 9h está reunida.',
+    'Pulse AI': 'Um rascunho ilustrativo de rede social espera aprovação.',
+    'AI SDR': 'Um lead ilustrativo pediu retorno.',
+    'Closer AI': 'O comercial ilustrativo ainda está no papel.',
+    'Onboard AI': 'O monitor ilustrativo de implantação mudou de etapa.',
+    'Care AI': 'O pós-venda ilustrativo ainda não começou.',
+    'Help AI': 'Um chamado ilustrativo de primeira linha entrou.',
+    'Fix AI': 'O diagnóstico ilustrativo ainda não está no ar.',
+    'Cash AI': 'Um recebimento ilustrativo espera aprovação. Dinheiro não passa do nível 2.',
+    'Vigia': 'Um sinal ilustrativo do ambiente pediu olhar.',
+    'Insight AI': 'Uma leitura ilustrativa da qualidade do Dyno AI ficou pronta.',
+    'Arquiteto': 'O desenho ilustrativo de uma mudança está na esteira.',
+    'Construtor': 'A peça ilustrativa da esteira foi montada.',
+    'Testes': 'A verificação ilustrativa da esteira terminou.',
+    'Revisor': 'A revisão ilustrativa da esteira está na fila.',
+    'Sentinela Esteira': 'O passo ilustrativo de publicação foi observado.',
+    'Gauntlet': 'A prova ilustrativa ao lado do Estaleiro terminou.'
   };
   function tickDemo(dt) {
     demoEm -= dt;
     if (demoEm > 0) return;
     demoEm = 14000 + Math.random() * 10000;
     if (agents.filter((a) => a.missao).length >= 2) return;
-    const livres = agents.filter((a) => !a.ceo && !a.missao && !a.fila.length);
+    const livres = agents.filter((a) => !a.ceo && !a.breve && !a.missao && !a.fila.length);
     if (!livres.length) return;
     const a = livres[Math.floor(Math.random() * livres.length)];
     notify(a.name, FALAS[a.name] || 'Tenho um aviso ilustrativo.', { demo: true });
   }
 
   function updateAgente(a, dt) {
-    if (a.ceo) return;
+    if (a.ceo || a.breve) return;
     if (a.missao && !a.missao.chegou) {
       const alvo = vizinhoDo(player, a);
       const chave = Math.floor(alvo.c) + ',' + Math.floor(alvo.r);
@@ -407,19 +474,28 @@
     tickDemo(dt);
   }
 
-  function boundsOf(id) {
-    const pts = [];
-    const add = (c, r, h) => pts.push(project(c, r, h));
-    if (!id) {
-      add(0, 0, WALL); add(COLS, 0, WALL); add(0, ROWS, 0); add(COLS, ROWS, 0);
-    } else {
-      const rm = room(id);
-      add(rm.c - 0.2, rm.r - 0.2, 70); add(rm.c + rm.w + 0.3, rm.r - 0.1, 64);
-      add(rm.c - 0.15, rm.r + rm.h + 0.45, 0); add(rm.c + rm.w + 0.3, rm.r + rm.h + 0.45, 0);
-    }
+  function caixa(c0, r0, c1, r1) {
+    const pts = [project(c0, r0, WALL), project(c1, r0, WALL), project(c0, r1, 0), project(c1, r1, 0)];
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
     for (const p of pts) { minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x); minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y); }
     return { x: minX - 16, y: minY - 12, w: maxX - minX + 32, h: maxY - minY + 28 };
+  }
+  function boundsOf(id) {
+    if (id === 'dyno') return caixa(0, 18.2, COLS, 36.3);
+    if (!id || id === 'dm') return caixa(0, -0.4, COLS, 16.8);
+    const rm = room(id);
+    if (!rm) return caixa(0, -0.4, COLS, 16.8);
+    return caixa(rm.c - 0.2, rm.r - 0.2, rm.c + rm.w + 0.3, rm.r + rm.h + 0.45);
+  }
+  function faixaR() {
+    if (seguir) {
+      const r = Math.floor(player.r);
+      return [Math.max(0, r - 12), Math.min(ROWS - 1, r + 10)];
+    }
+    if (focusId === 'dyno') return [18, ROWS - 1];
+    const rm = room(focusId);
+    if (rm) return [Math.max(0, rm.r - 2), Math.min(ROWS - 1, rm.r + rm.h + 2)];
+    return [0, 17];
   }
   function drawWalls() {
     const h = WALL;
@@ -432,17 +508,25 @@
     quad(project(c, r), project(c + 1, r), project(c + 1, r + 1), project(c, r + 1), col);
   }
   function drawFloor() {
-    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) if (W[at(c, r)]) {
+    const [r0, r1] = vista;
+    for (let r = r0; r <= r1; r++) for (let c = 0; c < COLS; c++) if (W[at(c, r)]) {
       tile(c, r, (c + r) % 2 ? '#171a22' : '#1c1f29');
     }
     for (const rm of ROOMS) {
+      if (rm.r + rm.h < r0 || rm.r > r1) continue;
+      ctx.save();
+      if (rm.breve) ctx.globalAlpha = 0.42;
       quad(project(rm.c, rm.r), project(rm.c + rm.w, rm.r), project(rm.c + rm.w, rm.r + rm.h), project(rm.c, rm.r + rm.h), rm.col + (rm.glass ? '99' : '66'));
       ctx.beginPath();
       const a = project(rm.c, rm.r), b = project(rm.c + rm.w, rm.r), c = project(rm.c + rm.w, rm.r + rm.h), d = project(rm.c, rm.r + rm.h);
       ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.lineTo(c.x, c.y); ctx.lineTo(d.x, d.y); ctx.closePath();
-      ctx.strokeStyle = rm.col; ctx.globalAlpha = rm.glass ? 0.95 : 0.55; ctx.lineWidth = rm.glass ? 2.4 : 1.5; ctx.stroke(); ctx.globalAlpha = 1;
+      ctx.strokeStyle = rm.id === 'odyn' ? '#d7f5b0' : rm.col;
+      ctx.globalAlpha = rm.breve ? 0.45 : rm.glass ? 0.95 : 0.55;
+      ctx.lineWidth = rm.id === 'odyn' ? 3.2 : rm.glass ? 2.4 : 1.5;
+      ctx.stroke();
+      ctx.restore();
     }
-    for (const [c, r] of PORTAS) tile(c, r, '#3a3428');
+    for (const [c, r] of PORTAS) if (r >= r0 && r <= r1) tile(c, r, '#3a3428');
     const edge = [project(0, 0), project(COLS, 0), project(COLS, ROWS), project(0, ROWS)];
     ctx.beginPath(); edge.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y))); ctx.closePath();
     ctx.strokeStyle = 'rgba(226,194,122,.8)'; ctx.lineWidth = 2; ctx.stroke();
@@ -522,24 +606,61 @@
     ctx.beginPath(); ctx.moveTo(x, y - 8); ctx.lineTo(x + 9, y - 5); ctx.lineTo(x + 9, y + 2); ctx.lineTo(x, y + 10); ctx.lineTo(x - 9, y + 2); ctx.lineTo(x - 9, y - 5); ctx.closePath();
     ctx.fill(); ctx.stroke();
   }
+  function drawPalco() {
+    box(3.05, 21.05, 2.7, 1.15, 10, '#d7f5b0', '#6ea84a', '#3e6a2c');
+    box(3.35, 21.3, 2.1, 0.55, 16, '#e2c27a', '#a6853f', '#6e5424');
+  }
+  function drawFluxos() {
+    if (!fluxos) return;
+    const ala = focusId === 'dyno' || (seguir && player.r > 17) || room(focusId)?.ala === 'dyno';
+    if (!ala) return;
+    const pos = (nome) => { const a = achar(nome); return project(a.homeC, a.homeR, 3); };
+    const est = project(6.2, 34.1, 3);
+    const seta = (pts, cor) => {
+      ctx.save();
+      ctx.strokeStyle = cor; ctx.fillStyle = cor; ctx.lineWidth = 2.6; ctx.setLineDash([8, 6]);
+      ctx.beginPath();
+      pts.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
+      ctx.stroke();
+      ctx.setLineDash([]);
+      for (let i = 1; i < pts.length; i++) {
+        const a = pts[i - 1], b = pts[i];
+        const ang = Math.atan2(b.y - a.y, b.x - a.x);
+        ctx.beginPath();
+        ctx.moveTo(b.x, b.y);
+        ctx.lineTo(b.x - 9 * Math.cos(ang - 0.45), b.y - 9 * Math.sin(ang - 0.45));
+        ctx.lineTo(b.x - 9 * Math.cos(ang + 0.45), b.y - 9 * Math.sin(ang + 0.45));
+        ctx.closePath(); ctx.fill();
+      }
+      ctx.restore();
+    };
+    seta(['Pulse AI', 'AI SDR', 'Closer AI', 'Onboard AI', 'Care AI'].map(pos), '#f0a05a');
+    seta([pos('Help AI'), pos('Fix AI'), est, pos('Help AI')], '#7eb6e0');
+    seta([pos('Vigia'), pos('Fix AI'), est], '#3ec6e0');
+    seta([pos('Brief AI'), project(7.5, 19.2, 3)], '#f0d78c');
+  }
   function drawAgent(a, walking) {
     const feet = project(a.c, a.r, 0);
     const bob = reduce ? 0 : walking ? Math.abs(Math.sin(t / 120)) * 2 : Math.sin(t / 700 + a.ph) * 1.4;
     const x = feet.x, y = feet.y - bob;
     ctx.save(); ctx.translate(x, y);
+    if (a.breve) ctx.globalAlpha = 0.3;
     const glow = a.room.col;
     ctx.fillStyle = 'rgba(0,0,0,.28)'; ellipse(0, 4, 13, 5, 'rgba(0,0,0,.28)');
     if (a.ceo && !reduce) {
       ctx.strokeStyle = '#e2c27a'; ctx.globalAlpha = 0.9; ctx.lineWidth = 1.6;
       ctx.beginPath(); ctx.ellipse(0, 3, 16, 6, 0, 0, 7); ctx.stroke(); ctx.globalAlpha = 1;
-    } else if (!a.ceo && !reduce) {
+    } else if (a.destaque && !reduce) {
+      ctx.strokeStyle = '#d7f5b0'; ctx.globalAlpha = 0.95; ctx.lineWidth = 2.4;
+      ctx.beginPath(); ctx.ellipse(0, 3, 20, 8, 0, 0, 7); ctx.stroke(); ctx.globalAlpha = 1;
+    } else if (!a.ceo && !a.breve && !reduce) {
       ctx.save(); ctx.strokeStyle = glow; ctx.globalAlpha = 0.7; ctx.setLineDash([3, 4]); ctx.lineWidth = 1.1;
       ctx.beginPath(); ctx.ellipse(0, 2, 14, 5.5, 0, 0, 7); ctx.stroke(); ctx.restore();
     }
     const step = walking && !reduce ? Math.sin(t / 90) * 2.2 : 0;
     const arm = !walking && a.status === 'digitando' && !reduce ? Math.sin(t / 80 + a.ph) * 3 : 0;
     const ink = 'rgba(8,12,20,.9)';
-    const cloth = a.ceo ? '#243044' : shade(glow, -25);
+    const cloth = a.ceo ? '#243044' : a.breve ? '#9aa0aa' : (a.tom || shade(glow, -25));
     const calca = a.ceo ? '#1a2330' : '#1c2430';
     rr(-7, -4 + step, 6, 11, 2, calca, ink); rr(1, -4 - step, 6, 11, 2, calca, ink);
     rr(-8, 5 + step, 7, 4, 2, '#0e1218', ink); rr(1, 5 - step, 7, 4, 2, '#0e1218', ink);
@@ -572,7 +693,7 @@
       ellipse(-4, -36, 1.7, 1.9, '#1a1a1a'); ellipse(4, -36, 1.7, 1.9, '#1a1a1a');
       ctx.fillStyle = '#fff'; ctx.fillRect(-4.6, -37, 1.2, 1.2); ctx.fillRect(3.4, -37, 1.2, 1.2);
     }
-    if (!a.ceo) {
+    if (!a.ceo && !a.breve) {
       ctx.save(); ctx.globalAlpha = 0.16; ctx.strokeStyle = '#e8fbff'; ctx.lineWidth = 1;
       for (let yy = -46; yy < 6; yy += 4) { ctx.beginPath(); ctx.moveTo(-14, yy); ctx.lineTo(14, yy); ctx.stroke(); }
       ctx.restore();
@@ -610,13 +731,20 @@
     const x = (sx - cam.ox) / cam.s, y = (sy - cam.oy) / cam.s;
     return { c: (x / (TW / 2) + y / (TH / 2)) / 2, r: (y / (TH / 2) - x / (TW / 2)) / 2 };
   }
-  function visivel(a) { return !focusId || a.roomId === focusId || seguir; }
+  function visivel(a) {
+    if (seguir) return Math.abs(a.r - player.r) < 14 && Math.abs(a.c - player.c) < 16;
+    if (focusId === 'dyno') return a.room?.ala === 'dyno';
+    if (focusId === 'dm' || !focusId) return a.room?.ala !== 'dyno';
+    return a.roomId === focusId;
+  }
 
   function drawLabels() {
-    const overview = !seguir && !focusId && cam.s < 0.72;
+    const overview = !seguir && ((focusId === 'dyno' && cam.s < 0.95) || ((focusId === 'dm' || !focusId) && cam.s < 0.72));
     if (overview) {
+      const ala = focusId === 'dyno' ? 'dyno' : 'dm';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = '700 12px system-ui,sans-serif';
       for (const rm of ROOMS) {
+        if (rm.ala !== ala) continue;
         const p = toScreen(project(rm.c + rm.w / 2, rm.r + rm.h / 2, 6).x, project(rm.c + rm.w / 2, rm.r + rm.h / 2, 6).y);
         const w = ctx.measureText(rm.short).width + 16;
         rr(p.x - w / 2, p.y - 10, w, 20, 8, 'rgba(8,10,16,.88)');
@@ -631,15 +759,17 @@
       if (!visivel(a)) continue;
       const feet = project(a.c, a.r, 0);
       const s = toScreen(feet.x, feet.y - 78);
-      const extra = a.ceo ? ' · você' : (a.coord || a.bot ? ' ★' : '') + (a.shield ? ' 🛡' : '');
+      const extra = a.ceo ? ' · você' : a.breve ? ' · em breve' : (a.coord || a.bot ? ' ★' : '') + (a.shield ? ' 🛡' : '');
       const label = (a.ceo ? a.nome : a.name) + extra;
       const w = Math.min(220, ctx.measureText(label).width + (a.status ? 22 : 14));
       let y = s.y;
       for (const p of placed) if (Math.abs(p.x - s.x) < (p.w + w) / 2 && Math.abs(p.y - y) < 18) y = p.y - 18;
       placed.push({ x: s.x, y, w });
       const hot = hover === a;
-      rr(s.x - w / 2, y - 10, w, 20, 8, hot || a.ceo ? '#fffdf6' : 'rgba(8,10,16,.88)', a.ceo ? '#e2c27a' : a.room.col);
-      ctx.fillStyle = hot || a.ceo ? '#1b1f2e' : '#fff';
+      const claro = hot || a.ceo || a.destaque;
+      const borda = a.ceo ? '#e2c27a' : a.destaque ? '#8fd46a' : a.room.col;
+      rr(s.x - w / 2, y - 10, w, 20, 8, claro ? '#fffdf6' : 'rgba(8,10,16,.88)', borda);
+      ctx.fillStyle = claro ? '#1b1f2e' : '#fff';
       ctx.fillText(label, s.x + (a.status ? 4 : 0), y);
       if (a.status) {
         const dot = { digitando: '#7ee07e', 'em foco': '#ffb84d', 'em reunião': '#ff6f6f', disponível: '#4dd2ff' }[a.status];
@@ -683,6 +813,21 @@
     ctx.fillText(texto, s.x + (tipo === 'aviso' ? 8 : 0), s.y - 1);
     baloes.push({ a, x, y, w, h: 22, tipo });
   }
+  function drawLegendaFluxos() {
+    if (!fluxos) return;
+    const ala = focusId === 'dyno' || room(focusId)?.ala === 'dyno' || (seguir && player.r > 17);
+    if (!ala) return;
+    const itens = [['#f0a05a', 'Cliente novo'], ['#7eb6e0', 'Chamado'], ['#3ec6e0', 'Erro no ambiente'], ['#f0d78c', 'Gestão → Daniel']];
+    ctx.font = '700 12px system-ui,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    let y = 40;
+    for (const [cor, texto] of itens) {
+      const w = ctx.measureText(texto).width + 28;
+      rr(12, y, w, 20, 8, 'rgba(8,10,16,.88)');
+      ctx.fillStyle = cor; ctx.fillRect(18, y + 6, 8, 8);
+      ctx.fillStyle = '#fff'; ctx.fillText(texto, 32, y + 10);
+      y += 24;
+    }
+  }
   function captionSala() {
     if (!seguir) return;
     const rm = salaDe(player.c, player.r);
@@ -702,30 +847,38 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = '#0e1016'; ctx.fillRect(0, 0, viewW, viewH);
     ctx.setTransform(dpr * cam.s, 0, 0, dpr * cam.s, dpr * cam.ox, dpr * cam.oy);
-    if (focusId && !seguir) {
-      const rm = room(focusId), pad = 0.15;
+    vista = faixaR();
+    const rmFocus = !seguir ? room(focusId) : null;
+    if (rmFocus) {
+      const pad = 0.15;
       ctx.save();
       ctx.beginPath();
-      const a = project(rm.c - pad, rm.r - pad), b = project(rm.c + rm.w + pad, rm.r - pad);
-      const c = project(rm.c + rm.w + pad, rm.r + rm.h + pad), d = project(rm.c - pad, rm.r + rm.h + pad);
+      const a = project(rmFocus.c - pad, rmFocus.r - pad), b = project(rmFocus.c + rmFocus.w + pad, rmFocus.r - pad);
+      const c = project(rmFocus.c + rmFocus.w + pad, rmFocus.r + rmFocus.h + pad), d = project(rmFocus.c - pad, rmFocus.r + rmFocus.h + pad);
       ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.lineTo(c.x, c.y); ctx.lineTo(d.x, d.y); ctx.closePath();
       ctx.clip();
     }
-    drawWalls(); drawFloor();
-    pool(8, 1.6, 80, 'rgba(240,215,140,.16)');
-    pool(12.8, 14.2, 70, 'rgba(224,192,128,.16)');
-    pool(17.2, 14.4, 60, 'rgba(126,200,195,.16)');
-    medallion(9.5, 5.5);
+    drawWalls(); drawFloor(); drawFluxos();
+    if (vista[0] < 10) {
+      pool(8, 1.6, 80, 'rgba(240,215,140,.16)');
+      pool(12.8, 14.2, 70, 'rgba(224,192,128,.16)');
+      pool(17.2, 14.4, 60, 'rgba(126,200,195,.16)');
+      medallion(9.5, 5.5);
+    }
+    if (vista[1] > 20) pool(5, 22.4, 96, 'rgba(141,212,106,.22)');
     const list = [];
     const add = (k, fn) => list.push({ k, fn });
-    add(7.2, drawMesaExec);
+    if (vista[0] < 16) {
+      add(7.2, drawMesaExec);
+      [[1, 9], [11, 9], [18, 7], [1, 13], [4, 15], [6, 13]].forEach(([c, r]) => add(c + r, () => drawPlant(c, r)));
+      add(26, drawMesaCopa); add(26.2, drawCafe); add(30, drawLounge);
+    }
+    if (vista[1] > 20) add(24.4, drawPalco);
     for (const a of agents) if (a.desk && visivel(a)) add(a.desk[0] + a.desk[1] + 0.2, () => drawDesk(a));
-    [[1, 9], [11, 9], [18, 7], [1, 13], [4, 15], [6, 13]].forEach(([c, r]) => add(c + r, () => drawPlant(c, r)));
-    add(26, drawMesaCopa); add(26.2, drawCafe); add(30, drawLounge);
     for (const a of agents) if (visivel(a)) add(a.c + a.r + 0.05, () => drawAgent(a, andando(a)));
     list.sort((a, b) => a.k - b.k);
     for (const it of list) it.fn();
-    drawGlass();
+    if (vista[0] < 8) drawGlass();
     if (mouse && seguir) {
       const w = unproject(mouse.x, mouse.y);
       const cell = perto(w.c, w.r, 1);
@@ -735,7 +888,7 @@
         ctx.globalAlpha = 1;
       }
     }
-    if (focusId && !seguir) ctx.restore();
+    if (rmFocus) ctx.restore();
     for (const a of agents) if (visivel(a)) {
       const feet = project(a.c, a.r, 0);
       const s = toScreen(feet.x, feet.y - 20);
@@ -744,14 +897,16 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (focusId && !seguir) {
       const rm = room(focusId);
-      const texto = rm.sub ? rm.name + ' · ' + rm.sub : rm.name;
+      const texto = rm ? (rm.sub ? rm.name + ' · ' + rm.sub : rm.name) : (focusId === 'dyno' ? 'Operação Dyno' : 'Escritório');
+      const col = rm ? rm.col : (focusId === 'dyno' ? '#8fd46a' : '#e2c27a');
       ctx.font = '700 13px system-ui,sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
       const w = ctx.measureText(texto).width + 16;
       rr(12, 10, w, 22, 8, 'rgba(8,10,16,.88)');
-      ctx.fillStyle = rm.col; ctx.fillRect(18, 16, 8, 8);
+      ctx.fillStyle = col; ctx.fillRect(18, 16, 8, 8);
       ctx.fillStyle = '#fff'; ctx.fillText(texto, 32, 21);
     }
     captionSala();
+    drawLegendaFluxos();
     drawLabels();
     drawBaloes();
     hover = null;
@@ -796,17 +951,29 @@
     h.id = 'card-nome';
     h.textContent = (a.ceo ? a.nome : a.name) + (a.coord ? ' ★' : '') + (a.shield ? ' 🛡' : '');
     const papel = document.createElement('p'); papel.className = 'papel';
-    papel.textContent = a.ceo ? 'CEO' : a.bot ? 'CTO' : a.coord ? 'Coordenador' : a.shield ? 'Segurança' : 'Agente';
+    papel.textContent = a.ceo ? 'CEO' : a.bot ? 'CTO' : a.destaque ? 'Carro-chefe' : a.brief ? 'Ponte de gestão' : a.breve ? 'Em breve' : a.coord ? 'Coordenador' : a.shield ? 'Segurança' : 'Agente';
     const area = document.createElement('p'); area.className = 'area';
     const dot = document.createElement('span'); dot.className = 'ponto'; dot.style.background = a.room.col;
     area.append(dot, document.createTextNode(a.room.sub ? a.room.name + ' · ' + a.room.sub : a.room.name));
     corpo.append(h, papel, area);
+    const campo = (rotulo, texto) => {
+      if (!texto) return;
+      const p = document.createElement('p');
+      const sm = document.createElement('small');
+      sm.textContent = rotulo;
+      p.append(sm, document.createTextNode(texto));
+      corpo.append(p);
+    };
     if (a.bot) { const g = document.createElement('p'); g.textContent = 'Gerente dos agentes.'; corpo.append(g); }
-    else if (!a.ceo) {
+    else if (!a.ceo && !a.cuida) {
       const role = document.createElement('p');
       role.textContent = a.role.charAt(0).toUpperCase() + a.role.slice(1) + '.';
       corpo.append(role);
     }
+    campo('Situação: ', a.sit);
+    campo('Nível: ', a.nivel);
+    campo('Cuida de: ', a.cuida);
+    campo('Nunca faz: ', a.nunca);
     if (!a.ceo) {
       const resp = document.createElement('p');
       const sm = document.createElement('small'); sm.textContent = 'Responde a: ';
@@ -829,7 +996,7 @@
     }
     card.hidden = false;
     if (window.innerWidth < 960) { card.style.left = '12px'; card.style.top = 'auto'; return; }
-    const w = 300, hgt = card.offsetHeight || 200;
+    const w = 340, hgt = card.offsetHeight || 220;
     const x = Math.max(8, Math.min((pt?.x || 80) + 12, window.innerWidth - w - 8));
     const y = Math.max(8, Math.min((pt?.y || 80) + 12, window.innerHeight - hgt - 8));
     card.style.left = x + 'px'; card.style.top = y + 'px';
@@ -878,9 +1045,18 @@
     const b = document.createElement('button'); b.type = 'button'; b.dataset.id = id; b.textContent = label;
     b.style.setProperty('--c', col); b.addEventListener('click', () => setFocus(id)); salas.append(b);
   }
-  chip('', 'Visão geral', '#e2c27a');
+  chip('dm', 'Escritório', '#e2c27a');
+  chip('dyno', 'Operação Dyno', '#8fd46a');
   ROOMS.forEach((r) => chip(r.id, r.short, r.col));
   document.getElementById('centralizar').addEventListener('click', () => { seguir = true; focusId = ''; syncChips(); });
+  const btnFluxos = document.getElementById('fluxos');
+  if (btnFluxos) btnFluxos.addEventListener('click', () => {
+    fluxos = !fluxos;
+    btnFluxos.classList.toggle('is-on', fluxos);
+    btnFluxos.setAttribute('aria-pressed', fluxos ? 'true' : 'false');
+    const noEscritorio = seguir ? player.r < 18 : (focusId === 'dm' || !focusId || room(focusId)?.ala === 'dm');
+    if (fluxos && noEscritorio) setFocus('dyno');
+  });
   syncChips();
 
   const arvore = document.getElementById('arvore');
@@ -903,6 +1079,15 @@
       if (!coord) continue;
       linha('n2', '★ ' + coord.name + ' · ' + rm.short, coord);
       agents.filter((a) => a.roomId === rm.id && !a.coord).forEach((a) => linha('n3', a.name + (a.shield ? ' · segurança' : ''), a));
+    }
+    linha('n1', 'Operação Dyno', null, () => setFocus('dyno'));
+    linha('n2', 'Brief AI · ponte', achar('Brief AI'));
+    linha('n2', 'Dyno AI · carro-chefe', achar('Dyno AI'));
+    linha('n3', 'Dina', achar('Dina'));
+    for (const id of ['cres', 'cli', 'fin', 'tec', 'brev']) {
+      const rm = room(id);
+      linha('n2', rm.short, null, () => setFocus(id));
+      agents.filter((a) => a.roomId === id).forEach((a) => linha(a.breve ? 'n3 breve' : 'n3', a.name, a));
     }
   }
   montarArvore();
@@ -950,6 +1135,24 @@
       return true;
     },
     demo: (ligado) => { demoEm = ligado ? 8000 : 1e15; },
+    repouso: () => {
+      for (const a of agents) {
+        a.c = a.homeC; a.r = a.homeR; a.caminho = null; a.passo = 0;
+        a.missao = null; a.fila.length = 0; a.espera = 1e9; a.ultimoAlvo = '';
+      }
+      demoEm = 1e15;
+    },
+    card: (nome) => {
+      const a = nome === 'Daniel' || nome === player.nome ? player : achar(nome);
+      if (!a) return '';
+      abrir(a, { x: 640, y: 120 });
+      return document.getElementById('card-corpo').textContent;
+    },
+    fluxos: (v) => {
+      fluxos = !!v;
+      const b = document.getElementById('fluxos');
+      if (b) { b.classList.toggle('is-on', fluxos); b.setAttribute('aria-pressed', fluxos ? 'true' : 'false'); }
+    },
     get baloes() { return baloes.map((b) => ({ nome: b.a.name, tipo: b.tipo, x: b.x, y: b.y, w: b.w, h: b.h })); },
     estado: () => agents.map((a) => ({ name: a.name, sala: (salaDe(a.c, a.r) || {}).id || 'corredor', andando: andando(a), missao: !!(a.missao && a.missao.chegou), passou: a.passou || {} }))
   };

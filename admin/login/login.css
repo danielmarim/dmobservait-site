@@ -1,5 +1,9 @@
 /* Tela /admin/login. Usa os tokens de ../../styles.css e as classes do painel (admin.css). */
-.lg { padding: 48px 0 96px; }
+.lg { padding: 48px 0 28px; }
+.lg-powered { display: flex; justify-content: center; margin: 0; padding: 8px 16px calc(24px + env(safe-area-inset-bottom)); }
+.lg-powered a { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font: 600 11px/1 var(--font-body); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; }
+.lg-powered a:hover { color: var(--ink); }
+.lg-powered img { height: 22px; width: auto; display: block; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 3px 7px; }
 .lg-cartao { max-width: 460px; margin: 0 auto; padding: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
 .lg-cartao h1 { font-size: clamp(26px, 5vw, 32px); margin: 0 0 8px; }
 .lg-cartao p { color: var(--muted); margin: 0 0 18px; }

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WorkAI · Escritório virtual | DM ObservaIT</title>
+<meta name="description" content="Escritório virtual dos agentes de IA da DM ObservaIT. Os status são ilustrativos.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/workai/workai.css">
+</head>
+<body>
+<header class="topo">
+  <div class="marca">
+    <span class="losango" aria-hidden="true"></span>
+    <div>
+      <h1>Work<span>AI</span></h1>
+      <p>Escritório virtual dos agentes · DM ObservaIT</p>
+    </div>
+  </div>
+  <div class="acoes">
+    <button type="button" class="sair" id="centralizar">Centralizar</button>
+    <button type="button" class="sair" id="fluxos" aria-pressed="false">Fluxos</button>
+    <form method="post" action="/admin/auth/sair"><button class="sair" type="submit">Sair</button></form>
+  </div>
+</header>
+<nav class="salas" id="salas" aria-label="Salas do escritório"></nav>
+<div class="corpo">
+  <div class="palco" id="palco">
+    <canvas id="c" aria-label="Escritório isométrico. Setas, WASD ou toque no chão para andar. Perto de um agente, Falar abre o card."></canvas>
+    <p class="dica">Setas, WASD ou toque no chão para andar.</p>
+    <p class="selo">status ilustrativo</p>
+  </div>
+  <a class="powered" href="https://dmobservait.com">Powered by<img src="/workai/assets/observait-logo.png" alt="ObservaIT, ecossistema de tecnologia" width="249" height="61"></a>
+  <aside>
+    <h2>Níveis de autonomia</h2>
+    <ul class="niveis">
+      <li><b>0</b> Só lê</li>
+      <li><b>1</b> Sugere</li>
+      <li><b>2</b> Executa com aprovação</li>
+      <li><b>3</b> Executa sozinho no limite</li>
+    </ul>
+    <p class="regra">Dinheiro nunca passa do nível 2.</p>
+    <h2>Hierarquia</h2>
+    <div class="arvore" id="arvore"></div>
+    <p class="nota">Daniel (CEO) fica acima do Dyno Bot (CTO) e da Dyna 2.0, chefe da Dynamo Wear. A Operação Dyno responde à Diretoria pelo Brief AI. A saída de parceiro é proposta e fica esmaecida. ★ coordenador · escudo de segurança. Um aviso (demo) faz o agente vir até você. Os status são ilustrativos.</p>
+  </aside>
+</div>
+<div id="card" hidden role="dialog" aria-modal="false" aria-labelledby="card-nome">
+  <button type="button" id="card-fechar" aria-label="Fechar">×</button>
+  <div id="card-corpo"></div>
+</div>
+<script src="/workai/workai.js" defer></script>
+</body>
+</html>

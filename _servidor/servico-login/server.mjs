@@ -104,7 +104,12 @@ setInterval(() => {
 const b64 = (b) => Buffer.from(b).toString('base64url');
 const assinar = (txt) => createHmac('sha256', SEGREDO).update('sessao|').update(txt).digest();
 const cookieDe = (req) => { for (const p of String(req.headers.cookie || '').split(';')) { const i = p.indexOf('='); if (i > 0 && p.slice(0, i).trim() === COOKIE) return p.slice(i + 1).trim(); } return ''; };
+// Sem Domain, de propósito. O prefixo __Host- exige Path=/ e Secure e proíbe Domain: o navegador
+// descartaria o cookie se ele levasse Domain, e Domain=.dmobservait.com ainda mandaria a sessão do
+// painel para qualquer outro subdomínio. O WorkAI entra pelo mesmo serviço, com outro cookie deste host.
 const setCookie = (valor, maxAge) => `${COOKIE}=${valor}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${maxAge}`;
+const hostPedido = (req) => String(req.headers.host || '').split(',')[0].trim().toLowerCase().replace(/:\d+$/, '');
+const destinoDepoisDoLogin = (req, u) => (hostPedido(req) === 'workai.dmobservait.com' ? '/' : primeiraPagina(u));
 const lerCookie = (valor) => {
   if (!SEGREDO || typeof valor !== 'string') return null;
   const [corpo, sig] = valor.split('.');
@@ -328,7 +333,7 @@ const rotas = async (req, res) => {
     if (u.status === 'convite') { u.status = 'ativo'; u.primeiroAcesso = new Date().toISOString(); }
     u.ultimoAcesso = new Date().toISOString();
     armazem.salvarUsuarios();
-    return json(res, 200, { ok: true, destino: primeiraPagina(u) }, { 'set-cookie': setCookie(criarSessao(u, req, 'código'), SESSAO_S) });
+    return json(res, 200, { ok: true, destino: destinoDepoisDoLogin(req, u) }, { 'set-cookie': setCookie(criarSessao(u, req, 'código'), SESSAO_S) });
   }
 
   if (req.method === 'POST' && p === '/auth/sair') {
@@ -341,7 +346,7 @@ const rotas = async (req, res) => {
 
   if (req.method === 'GET' && p === '/auth/inicio') { // para onde ir depois do login ou de um "sem acesso"
     const a = autenticar(req);
-    res.writeHead(302, { location: a ? primeiraPagina(a.u) : '/admin/login', 'cache-control': 'no-store' });
+    res.writeHead(302, { location: a ? destinoDepoisDoLogin(req, a.u) : '/admin/login', 'cache-control': 'no-store' });
     return res.end();
   }
 

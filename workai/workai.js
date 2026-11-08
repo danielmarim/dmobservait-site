@@ -41,8 +41,8 @@
   };
 
   const RAW = [
-    { room: 'dir', name: 'Daniel', role: 'CEO', ceo: true, c: 6.8, r: 2.6 },
-    { room: 'dir', name: 'Dyno Bot', role: 'Gerente dos agentes', bot: true, c: 8.4, r: 2.6 },
+    { room: 'dir', name: 'Daniel', role: 'CEO', ceo: true, c: 6.5, r: 3.1 },
+    { room: 'dir', name: 'Dyno Bot', role: 'Gerente dos agentes', bot: true, c: 9.0, r: 3.1 },
     { room: 'op', name: 'Recap AI', role: 'atas e follow-ups', desk: [2, 7], c: 2.5, r: 8.35 },
     { room: 'sre', name: 'Dyno Atlas', role: 'engenharia de IA e DevOps', coord: true, desk: [8, 7], c: 8.5, r: 8.35 },
     { room: 'sre', name: 'Stan', role: 'chamados N2/N3', desk: [11, 7], c: 11.5, r: 8.35 },
@@ -149,6 +149,20 @@
       caminho: null, passo: 0, espera: 5000 + (h % 9000), fila: [], missao: null, trava: 0, repath: 0, ultimoAlvo: '', _fora: false
     };
   });
+  // Mesas visuais para quem ainda não tinha desk (sem alterar pathfinding).
+  for (const a of agents) {
+    if (a.desk || a.ceo || a.bot) continue;
+    const dc = Math.max(0, Math.min(COLS - 1, Math.floor(a.homeC)));
+    const dr = Math.max(0, Math.min(ROWS - 1, Math.floor(a.homeR) - 1));
+    a.desk = [dc, dr];
+    a.deskVisual = true;
+  }
+  // Daniel / Dyno Bot: mesas laterais na Diretoria
+  const daniel = agents.find((a) => a.ceo);
+  const dynoBot = agents.find((a) => a.bot);
+  if (daniel) { daniel.desk = [4, 2]; daniel.deskVisual = true; }
+  if (dynoBot) { dynoBot.desk = [13, 2]; dynoBot.deskVisual = true; }
+
   for (const [c, r] of PORTAS) if (!livre(c, r)) erros.push('porta fechada ' + c + ',' + r);
   for (const [id, lista] of Object.entries(VAGAS)) for (const [c, r] of lista) if (!livre(c, r)) erros.push('vaga ' + id + ' ' + c + ',' + r);
   if (erros.length) console.warn('WorkAI mapa', erros.join('; '));
@@ -402,8 +416,11 @@
   let modoFoco = false, modoMini = false, showMini = true;
   const keys = new Set();
   const hits = [];
+  const pinça = new Map();
+  let pinçaDist = 0;
   let proxAgente = null;
   let salaAtual = null;
+  let hover = null;
   let ready = false;
 
   function layout() {
@@ -412,18 +429,40 @@
     dpr = Math.min(viewW < 720 ? 1.5 : 2, devicePixelRatio || 1);
     cvs.width = Math.round(viewW * dpr); cvs.height = Math.round(viewH * dpr);
   }
+  // Zoom 1 = Diretoria + fileira vizinha (~11.5 rows). Fundo do palco = piso (sem preto).
+  function escalaCasa() {
+    return Math.min(viewW / (COLS * TILE), viewH / (11.5 * TILE));
+  }
   function camera() {
-    const base = viewW < 720 ? 1.15 : 1.35;
-    const s = base * zoomUser;
-    let cx = player.c, cy = player.r;
-    if (!seguir && focusId) {
-      const rm = room(focusId);
-      if (rm) { cx = rm.c + rm.w / 2; cy = rm.r + rm.h / 2; }
-      else if (focusId === 'dyno') { cx = 10; cy = 27; }
-      else if (focusId === 'wear') { cx = 10; cy = 45; }
-      else if (focusId === 'dm') { cx = 10; cy = 8; }
+    const s = escalaCasa() * zoomUser;
+    let ox, oy;
+    if (seguir) {
+      ox = (viewW - COLS * TILE * s) / 2;
+      // ancora o topo do mapa (r=0) perto do topo da tela
+      oy = 8;
+      // se o jogador descer, acompanha mantendo-o no terço superior
+      const follow = viewH * 0.34 - player.r * TILE * s;
+      if (follow < oy) oy = follow;
+      const minOy = viewH - ROWS * TILE * s;
+      oy = Math.min(8, Math.max(minOy, oy));
+    } else {
+      let cx = COLS / 2, cy = ROWS / 2;
+      if (focusId) {
+        const rm = room(focusId);
+        if (rm) { cx = rm.c + rm.w / 2; cy = rm.r + rm.h / 2; }
+        else if (focusId === 'dyno') { cx = 10; cy = 28; }
+        else if (focusId === 'wear') { cx = 10; cy = 45; }
+        else if (focusId === 'dm') { cx = 10; cy = 8; }
+      }
+      ox = viewW / 2 - cx * TILE * s;
+      oy = viewH / 2 - cy * TILE * s;
+      const mapW = COLS * TILE * s, mapH = ROWS * TILE * s;
+      if (mapW <= viewW) ox = (viewW - mapW) / 2;
+      else ox = Math.min(0, Math.max(viewW - mapW, ox));
+      if (mapH <= viewH) oy = (viewH - mapH) / 2;
+      else oy = Math.min(8, Math.max(viewH - mapH, oy));
     }
-    cam = { s, ox: viewW / 2 - cx * TILE * s, oy: viewH / 2 - cy * TILE * s };
+    cam = { s, ox, oy };
   }
   function aplicarZoom(fator) {
     zoomUser = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoomUser * fator));
@@ -453,17 +492,22 @@
     ctx.fillStyle = col;
     ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h));
   }
+  function noPredio(c, r) {
+    if (c < 0 || r < 0 || c >= COLS || r >= ROWS) return false;
+    if (r <= 36) return true; // casa + dyno + ponte
+    return true; // wear
+  }
   function pisoCor(c, r) {
     const rm = salaDe(c + 0.5, r + 0.5);
-    if (rm?.piso) return ((c + r) & 1) ? rm.piso : shade(rm.piso, 12);
-    if (r >= 38) return ((c + r) & 1) ? '#1a1a1d' : '#121214';
-    if (r >= 36) return ((c + r) & 1) ? '#3a2c1e' : '#2a2118';
-    // madeira clara aconchegante (estilo Gather)
+    if (rm?.piso) return ((c + r) & 1) ? rm.piso : shade(rm.piso, 14);
+    if (r >= 38) return ((c + r) & 1) ? '#2a221c' : '#221c18';
+    if (r >= 36) return ((c + r) & 1) ? '#c4ad88' : '#b79d78';
+    // corredor / sala: madeira clara contínua (sem “buraco” escuro)
     if (rm) {
-      const base = rm.glass ? '#d7c4a0' : '#cbb892';
-      return ((c + r) & 1) ? base : shade(base, -10);
+      const base = rm.glass ? '#e0d0ae' : '#d4c19a';
+      return ((c + r) & 1) ? base : shade(base, -8);
     }
-    return ((c + r) & 1) ? '#b9a684' : '#a89470';
+    return ((c + r) & 1) ? '#d0be9a' : '#c4b08c';
   }
   function drawFloor() {
     const margin = 2;
@@ -472,163 +516,225 @@
     const c1 = Math.min(COLS - 1, Math.ceil((viewW - cam.ox) / (TILE * cam.s)) + margin);
     const r1 = Math.min(ROWS - 1, Math.ceil((viewH - cam.oy) / (TILE * cam.s)) + margin);
     for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) {
-      if (!W[at(c, r)]) {
-        px(worldX(c), worldY(r), TILE, TILE, '#0c1018');
+      if (!noPredio(c, r)) {
+        px(worldX(c), worldY(r), TILE, TILE, '#0f131c');
         continue;
       }
+      // piso contínuo também em células bloqueadas (móveis por cima)
       px(worldX(c), worldY(r), TILE, TILE, pisoCor(c, r));
-      // ripa
       if (r < 36) {
-        ctx.fillStyle = 'rgba(80,55,30,.12)';
+        ctx.fillStyle = 'rgba(90,60,30,.10)';
         ctx.fillRect(worldX(c), worldY(r) + TILE - 2, TILE, 2);
       }
     }
-    // tapetes
-    for (const rm of ROOMS) {
-      if (rm.breve || rm.ala === 'wear') continue;
-      if (rm.r > r1 || rm.r + rm.h < r0) continue;
-      const pad = 0.35;
-      ctx.fillStyle = rm.col + '33';
-      ctx.fillRect(worldX(rm.c + pad), worldY(rm.r + pad), (rm.w - pad * 2) * TILE, (rm.h - pad * 2) * TILE);
-    }
   }
   function drawWalls() {
-    // paredes com “profundidade”: topo mais claro + sombra
-    const wall = (c, r, w, h, col) => {
-      px(worldX(c), worldY(r), w * TILE, h * TILE, shade(col, -50));
-      px(worldX(c), worldY(r), w * TILE, 6, shade(col, -20));
-      px(worldX(c), worldY(r) + 6, w * TILE, 3, shade(col, 10));
-    };
-    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
-      if (W[at(c, r)]) continue;
-      // só desenha parede se vizinho andável
-      const viz = livre(c + 1, r) || livre(c - 1, r) || livre(c, r + 1) || livre(c, r - 1);
-      if (!viz) continue;
-      const wear = r >= 38;
-      wall(c, r, 1, 1, wear ? '#2a1810' : '#6a5744');
-    }
-    // contorno de salas + destaque privada
     for (const rm of ROOMS) {
       const x = worldX(rm.c), y = worldY(rm.r), w = rm.w * TILE, h = rm.h * TILE;
-      ctx.strokeStyle = rm === salaAtual ? '#fff' : rm.col;
-      ctx.lineWidth = rm === salaAtual ? 4 : (rm.glass ? 3 : 2);
-      ctx.globalAlpha = rm === salaAtual ? 0.95 : 0.55;
+      const ativa = rm === salaAtual;
+      // parede fina com sombra (corredor fica o piso claro ao redor)
+      px(x, y, w, 4, shade(rm.ala === 'wear' ? '#3a2818' : '#8a7358', -5));
+      ctx.strokeStyle = ativa ? '#ffffff' : (rm.ala === 'wear' ? '#e8893a' : '#5a4838');
+      ctx.lineWidth = ativa ? 2.5 : 2;
+      ctx.globalAlpha = ativa ? 0.95 : 0.85;
       ctx.strokeRect(x + 1, y + 1, w - 2, h - 2);
       ctx.globalAlpha = 1;
-      if (rm === salaAtual) {
-        ctx.fillStyle = rm.col + '22';
-        ctx.fillRect(x, y, w, h);
+      if (ativa) {
+        ctx.fillStyle = rm.col + '20';
+        ctx.fillRect(x + 3, y + 3, w - 6, h - 6);
       }
     }
   }
   function drawWindow(c, r) {
-    const x = worldX(c) + 6, y = worldY(r) + 4;
-    px(x, y, TILE - 12, 14, '#8ec8e8');
-    px(x, y, TILE - 12, 14, 'rgba(255,255,255,.25)');
-    ctx.strokeStyle = '#5a4636'; ctx.lineWidth = 2;
-    ctx.strokeRect(x, y, TILE - 12, 14);
-    ctx.beginPath(); ctx.moveTo(x + (TILE - 12) / 2, y); ctx.lineTo(x + (TILE - 12) / 2, y + 14); ctx.stroke();
+    const x = worldX(c) + 8, y = worldY(r) + 8;
+    px(x - 2, y - 2, TILE - 12, 16, '#5a4636');
+    px(x, y, TILE - 16, 12, '#9fd0ea');
+    ctx.fillStyle = 'rgba(255,255,255,.28)';
+    ctx.fillRect(x, y, (TILE - 16) / 2, 12);
+    ctx.strokeStyle = '#3e3228'; ctx.lineWidth = 1.5;
+    ctx.strokeRect(x, y, TILE - 16, 12);
   }
   function drawPlant(c, r) {
-    const x = worldX(c) + 10, y = worldY(r) + 12;
-    px(x + 6, y + 14, 10, 10, '#8a5a3a');
-    px(x + 2, y + 2, 18, 16, '#2f8a4a');
-    px(x + 6, y - 2, 10, 10, '#3cb371');
+    const x = worldX(c) + 8, y = worldY(r) + 8;
+    px(x + 8, y + 18, 12, 10, '#8a5a3a');
+    px(x + 2, y + 4, 22, 18, '#2f8a4a');
+    px(x + 8, y - 2, 12, 12, '#3cb371');
+    px(x + 14, y + 6, 10, 10, '#145c34');
+  }
+  function drawQuadro(c, r, col) {
+    const x = worldX(c) + 10, y = worldY(r) + 8;
+    px(x - 2, y - 2, 22, 18, '#5a4636');
+    px(x, y, 18, 14, col || '#dfe8f2');
+    px(x + 3, y + 3, 12, 8, shade(col || '#dfe8f2', -25));
+  }
+  function drawChair(x, y) {
+    px(x, y, 16, 14, '#5c4636');
+    px(x + 2, y - 8, 12, 10, '#7a5a42');
+    px(x + 3, y - 6, 10, 6, '#8a6a4a');
   }
   function drawDesk(a) {
     if (!a.desk) return;
     const [c, r] = a.desk;
-    const x = worldX(c) + 2, y = worldY(r) + 4;
-    px(x, y, TILE - 4, TILE - 10, '#d7b07a');
-    px(x, y, TILE - 4, 4, '#e8d0a8');
-    px(x + 8, y + 8, 14, 10, '#1b1e28');
-    px(x + 10, y + 4, 10, 8, a.presenca === 'foco' ? '#5cf0ff' : '#243040');
-    // cadeira
-    px(x + 8, y + TILE - 8, 16, 8, '#5c4636');
-    // plaquinha
-    const nome = a.name.slice(0, 12);
-    ctx.font = '700 8px system-ui,sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    const tw = Math.min(TILE - 4, ctx.measureText(nome).width + 6);
-    px(x + (TILE - 4 - tw) / 2, y - 8, tw, 10, '#fffdf6');
-    ctx.fillStyle = '#1b1f2e';
-    ctx.fillText(nome, x + (TILE - 4) / 2, y - 3);
+    const x = worldX(c) + 2, y = worldY(r) + 1;
+    // tampo da mesa (ocupa quase o tile)
+    px(x, y, TILE - 4, 22, '#c9955a');
+    px(x + 1, y + 1, TILE - 6, 4, '#e6c48a');
+    px(x + 2, y + 18, TILE - 8, 3, '#8a6238');
+    // laptop aberto
+    px(x + 11, y + 8, 18, 3, '#11141c');
+    px(x + 12, y + 2, 16, 10, '#1b1e28');
+    px(x + 14, y + 3, 12, 7, a.presenca === 'foco' ? '#5cf0ff' : '#4a90c8');
+    // cadeira à frente
+    drawChair(x + 11, y + 26);
+    // plaquinha só se o agente não está em cima da mesa (evita colidir com o nome)
+    const pertoMesa = Math.hypot(a.c - (c + 0.5), a.r - (r + 0.9)) < 1.35;
+    if (!a.ceo && !a.bot && !pertoMesa) {
+      const nome = a.name.length > 8 ? a.name.slice(0, 7) + '…' : a.name;
+      ctx.font = '600 7px system-ui,sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      const tw = Math.min(TILE - 12, ctx.measureText(nome).width + 5);
+      const px0 = x + (TILE - 4 - tw) / 2, py0 = y + 20;
+      px(px0, py0, tw, 8, '#fff8ea');
+      ctx.fillStyle = '#4a3a28';
+      ctx.fillText(nome, x + (TILE - 4) / 2, py0 + 4);
+    }
+  }
+  function drawRoomDecor() {
+    for (const rm of ROOMS) {
+      if (rm.breve) continue;
+      // tapete
+      const pad = 0.35;
+      ctx.fillStyle = rm.ala === 'wear' ? 'rgba(255,122,26,.14)' : (rm.col + '30');
+      ctx.fillRect(worldX(rm.c + pad), worldY(rm.r + pad), (rm.w - pad * 2) * TILE, (rm.h - pad * 2) * TILE);
+      // borda do tapete
+      ctx.strokeStyle = rm.col + '55';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(worldX(rm.c + pad), worldY(rm.r + pad), (rm.w - pad * 2) * TILE, (rm.h - pad * 2) * TILE);
+      // planta + quadro
+      drawPlant(rm.c + rm.w - 1.05, rm.r + rm.h - 1.05);
+      if (rm.w >= 4) drawPlant(rm.c + 0.1, rm.r + rm.h - 1.05);
+      if (rm.id !== 'dir' && rm.id !== 'copa') {
+        drawQuadro(rm.c + 0.2, rm.r + 0.2, rm.col);
+        if (rm.w >= 5) drawWindow(rm.c + rm.w - 1.15, rm.r + 0.15);
+      }
+    }
   }
   function drawCozinha() {
-    // bancada + geladeira + mesa de reunião grande
-    px(worldX(11.1), worldY(13.1), 3.6 * TILE, 0.55 * TILE, '#ece7dc');
-    px(worldX(11.2), worldY(13.2), 0.7 * TILE, 0.4 * TILE, '#9aabbc');
-    px(worldX(13.7), worldY(13.15), 0.85 * TILE, 0.7 * TILE, '#dfe6ee');
-    px(worldX(12.2), worldY(13.2), 0.5 * TILE, 0.35 * TILE, '#5c4636');
-    // mesa de reunião oval/grande
-    px(worldX(11.7), worldY(14.2), 2.6 * TILE, 1.35 * TILE, '#c4a878');
-    px(worldX(11.9), worldY(14.35), 2.2 * TILE, 1.05 * TILE, '#e8d7b8');
-    ctx.strokeStyle = '#8a6e48'; ctx.lineWidth = 2;
-    ctx.strokeRect(worldX(11.7) + 1, worldY(14.2) + 1, 2.6 * TILE - 2, 1.35 * TILE - 2);
-    // cadeiras ao redor
-    [[11.4, 14.4], [12.4, 14.4], [13.4, 14.4], [11.4, 15.2], [12.4, 15.2], [13.4, 15.2]].forEach(([c, r]) => {
-      px(worldX(c), worldY(r), 12, 12, '#5c4636');
+    // bancada contínua
+    px(worldX(11.15), worldY(13.12), 3.65 * TILE, 0.62 * TILE, '#ebe4d6');
+    px(worldX(11.15), worldY(13.12), 3.65 * TILE, 5, '#f7f2e8');
+    // pia
+    px(worldX(11.3), worldY(13.22), 0.8 * TILE, 0.42 * TILE, '#9eb0c2');
+    px(worldX(11.42), worldY(13.3), 0.55 * TILE, 0.26 * TILE, '#7f93a8');
+    px(worldX(11.55), worldY(13.18), 4, 8, '#c0c8d0'); // torneira
+    // cafeteira
+    px(worldX(12.25), worldY(13.2), 0.55 * TILE, 0.45 * TILE, '#3e2a20');
+    px(worldX(12.32), worldY(13.12), 0.4 * TILE, 0.14 * TILE, '#1e1410');
+    ctx.fillStyle = '#7a4030';
+    ctx.beginPath(); ctx.ellipse(worldX(12.52), worldY(13.48), 6, 3.5, 0, 0, 7); ctx.fill();
+    // geladeira alta (bem legível)
+    px(worldX(13.9), worldY(13.05), 1.0 * TILE, 1.2 * TILE, '#dfe8f0');
+    px(worldX(13.9), worldY(13.05), 1.0 * TILE, 4, '#f2f6fa');
+    px(worldX(14.0), worldY(13.2), 0.8 * TILE, 0.4 * TILE, '#c5d0dc');
+    px(worldX(14.0), worldY(13.7), 0.8 * TILE, 0.45 * TILE, '#c5d0dc');
+    px(worldX(14.75), worldY(13.45), 6, 16, '#7f8f9f');
+    px(worldX(14.05), worldY(13.35), 8, 3, '#9aabba');
+    px(worldX(14.05), worldY(13.85), 8, 3, '#9aabba');
+    // mesa café + cadeiras
+    px(worldX(11.25), worldY(14.55), 1.55 * TILE, 1.05 * TILE, '#d7b07a');
+    drawChair(worldX(11.4), worldY(15.55));
+    drawChair(worldX(12.2), worldY(15.55));
+    drawChair(worldX(11.4), worldY(14.25));
+    // mesa de reunião grande com 6 cadeiras
+    px(worldX(12.95), worldY(14.4), 2.05 * TILE, 1.45 * TILE, '#b89560');
+    px(worldX(13.1), worldY(14.55), 1.75 * TILE, 1.15 * TILE, '#e6d4b4');
+    ctx.strokeStyle = '#7a5a30'; ctx.lineWidth = 2;
+    ctx.strokeRect(worldX(12.95) + 1, worldY(14.4) + 1, 2.05 * TILE - 2, 1.45 * TILE - 2);
+    [[12.75, 14.55], [13.55, 14.55], [14.35, 14.55], [12.75, 15.5], [13.55, 15.5], [14.35, 15.5]].forEach(([c, r]) => {
+      drawChair(worldX(c), worldY(r));
     });
   }
   function drawLounge() {
-    px(worldX(16.3), worldY(14.5), 1.4 * TILE, 0.7 * TILE, '#f4efe4');
-    px(worldX(17.3), worldY(13.4), 1.1 * TILE, 0.7 * TILE, '#f4efe4');
-    px(worldX(17.0), worldY(14.2), 0.7 * TILE, 0.5 * TILE, '#c4a15a');
-    // fliperama
-    px(worldX(18.0), worldY(14.7), 0.7 * TILE, 0.7 * TILE, '#2a4a8a');
-    px(worldX(18.1), worldY(14.8), 0.5 * TILE, 0.35 * TILE, !reduce && Math.sin(t / 280) > 0 ? '#5cf0ff' : '#243040');
+    px(worldX(16.25), worldY(14.55), 1.45 * TILE, 0.7 * TILE, '#f4efe4');
+    px(worldX(16.25), worldY(14.55), 1.45 * TILE, 0.18 * TILE, '#fff8ee');
+    px(worldX(17.35), worldY(13.35), 1.15 * TILE, 0.7 * TILE, '#f4efe4');
+    px(worldX(17.0), worldY(14.15), 0.7 * TILE, 0.5 * TILE, '#c4a15a');
+    px(worldX(18.0), worldY(14.65), 0.7 * TILE, 0.75 * TILE, '#2a4a8a');
+    px(worldX(18.1), worldY(14.75), 0.5 * TILE, 0.35 * TILE, !reduce && Math.sin(t / 280) > 0 ? '#5cf0ff' : '#243040');
   }
   function drawDiretoria() {
     // mesa executiva
-    px(worldX(6.2), worldY(0.7), 4.2 * TILE, 1.5 * TILE, '#e8d7b8');
-    px(worldX(6.4), worldY(0.9), 3.8 * TILE, 1.1 * TILE, '#f3efe4');
-    // PC SSH
-    px(worldX(7.7), worldY(1.0), 0.9 * TILE, 0.7 * TILE, '#1b1e28');
-    px(worldX(7.85), worldY(1.1), 0.6 * TILE, 0.4 * TILE, '#3ddc97');
+    px(worldX(6.4), worldY(1.15), 3.8 * TILE, 1.0 * TILE, '#e8d7b8');
+    px(worldX(6.55), worldY(1.25), 3.5 * TILE, 0.8 * TILE, '#f3efe4');
+    // PC no norte da mesa — rótulo acima da tela
+    const pcX = worldX(7.95), pcY = worldY(1.25);
+    px(pcX, pcY, 0.9 * TILE, 0.7 * TILE, '#1b1e28');
+    px(pcX + 6, pcY + 6, 0.6 * TILE, 0.42 * TILE, '#3ddc97');
     ctx.font = '700 8px system-ui,sans-serif';
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    px(worldX(7.55), worldY(1.75), 1.2 * TILE, 12, 'rgba(8,10,16,.85)');
+    const sshW = 78;
+    px(pcX - 2, pcY - 15, sshW, 12, 'rgba(8,10,16,.92)');
+    ctx.strokeStyle = '#3ddc97'; ctx.lineWidth = 1.2;
+    ctx.strokeRect(pcX - 2, pcY - 15, sshW, 12);
     ctx.fillStyle = '#d7f5b0';
-    ctx.fillText('SSH · em breve', worldX(8.15), worldY(1.75) + 6);
-    hits.push({ tipo: 'pc', c: 8.1, r: 1.3, rad: 0.9 });
-    // logos na parede norte
+    ctx.fillText('SSH · em breve', pcX - 2 + sshW / 2, pcY - 9);
+    hits.push({ tipo: 'pc', c: 8.35, r: 1.6, rad: 0.9 });
+
+    // logos: três quadros iguais, bem dentro da parede norte
+    const f = 72, g = 48, fh = 38;
+    const t3 = f * 3 + g * 2;
+    const x0 = worldX(1.6) + ((16.8 * TILE) - t3) / 2;
+    const y0 = worldY(0.7);
     const slots = [
-      { img: MARCAS.observait, c: 2.0, w: 88, h: 24, fallback: 'ObservaIT' },
-      { img: MARCAS.wear, c: 9.2, w: 92, h: 22, fallback: 'Dynamo Wear' },
-      { img: MARCAS.dyno, c: 15.6, w: 28, h: 28, fallback: 'Dyno' }
+      { img: MARCAS.observait, fallback: 'DM ObservaIT' },
+      { img: MARCAS.wear, fallback: 'Dynamo Wear' },
+      { img: MARCAS.dyno, fallback: 'Dyno' }
     ];
-    for (const s of slots) {
-      const x = worldX(s.c), y = worldY(0.2);
-      px(x - 4, y - 4, s.w + 8, s.h + 8, '#f4f7f2');
-      ctx.strokeStyle = 'rgba(0,0,0,.15)'; ctx.strokeRect(x - 4, y - 4, s.w + 8, s.h + 8);
-      if (logoPronta(s.img)) ctx.drawImage(s.img, x, y, s.w, s.h);
-      else {
-        ctx.fillStyle = '#172d35'; ctx.font = '700 11px system-ui,sans-serif';
+    slots.forEach((s, i) => {
+      const x = x0 + i * (f + g);
+      px(x - 4, y0 - 4, f + 8, fh + 8, '#5a422c');
+      px(x - 2, y0 - 2, f + 4, fh + 4, '#c4a878');
+      px(x, y0, f, fh, '#f4f7f2');
+      if (logoPronta(s.img)) {
+        const iw = s.img.naturalWidth, ih = s.img.naturalHeight;
+        const sc = Math.min((f - 10) / iw, (fh - 10) / ih);
+        const dw = iw * sc, dh = ih * sc;
+        ctx.drawImage(s.img, x + (f - dw) / 2, y0 + (fh - dh) / 2, dw, dh);
+      } else {
+        ctx.fillStyle = '#172d35'; ctx.font = '700 9px system-ui,sans-serif';
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText(s.fallback, x + s.w / 2, y + s.h / 2);
+        ctx.fillText(s.fallback, x + f / 2, y0 + fh / 2);
       }
-    }
-    drawWindow(3, 0); drawWindow(12, 0); drawWindow(16, 0);
-    drawPlant(17.2, 2.5); drawPlant(1.2, 2.5);
+    });
+    // sem janelas na parede dos logos — só plantas nos cantos
+    drawPlant(17.4, 3.1);
+    drawPlant(1.2, 3.1);
   }
   function drawRoomLabels() {
     ctx.textAlign = 'left'; ctx.textBaseline = 'top';
-    ctx.font = '800 11px system-ui,sans-serif';
+    ctx.font = '700 9px system-ui,sans-serif';
     for (const rm of ROOMS) {
       if (rm.breve && modoFoco) continue;
-      const x = worldX(rm.c) + 6, y = worldY(rm.r) + 4;
-      const tw = ctx.measureText(rm.short).width + 10;
-      px(x, y, tw, 14, 'rgba(12,14,20,.72)');
-      ctx.fillStyle = rm.col;
-      ctx.fillText(rm.short, x + 5, y + 1);
+      const x = worldX(rm.c) + 3;
+      const y = worldY(rm.r) + (rm.id === 'dir' ? 48 : 3);
+      const tw = ctx.measureText(rm.short).width + 6;
+      px(x, y, tw, 11, 'rgba(12,14,20,.55)');
+      ctx.fillStyle = '#f4efe4';
+      ctx.fillText(rm.short, x + 3, y + 1);
     }
   }
-  function drawAvatar(a) {
+  function nomeVisivel(a) {
+    if (a.ceo) return true;
+    if (a === proxAgente || a.aceno > 0) return true;
+    if (hover === a) return true;
+    if (dist(a, player) < 1.7) return true;
+    return false;
+  }
+  function drawAvatar(a, nameSlots) {
     const walking = andando(a);
     const x = worldX(a.c), y = worldY(a.r);
     const bob = (!reduce && walking) ? Math.abs(Math.sin(a.frame * 1.6)) * 2 : 0;
     const wave = a.aceno > 0 ? Math.sin((600 - a.aceno) / 40) * 6 : 0;
-    // sombra
     ctx.fillStyle = 'rgba(0,0,0,.28)';
     ctx.beginPath(); ctx.ellipse(x, y + 10, 10, 4, 0, 0, 7); ctx.fill();
 
@@ -637,10 +743,12 @@
       px(x - 10, y - 10 - bob, 20, 20, col);
       px(x - 6, y - 6 - bob, 12, 10, a.skin);
       px(x + 8, y - 14 - bob, 8, 8, corPresenca(a.presenca));
-      ctx.font = '700 10px system-ui,sans-serif';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-      ctx.fillStyle = '#fff';
-      ctx.fillText(a.ceo ? a.nome : a.name, x, y + 14);
+      if (nomeVisivel(a)) {
+        ctx.font = '700 10px system-ui,sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+        ctx.fillStyle = '#fff';
+        ctx.fillText(a.ceo ? a.nome : a.name, x, y + 14);
+      }
       hits.push({ a, c: a.c, r: a.r, rad: 0.7 });
       return;
     }
@@ -648,7 +756,6 @@
     const dir = a.dir | 0;
     const step = walking && !reduce ? Math.sin(a.frame) * 2.2 : 0;
     const cloth = a.cloth;
-    // silhouette chibi (estilo escritório 2D)
     px(x - 10, y - 20 - bob, 20, 18, cloth);
     px(x - 9, y - 34 - bob, 18, 16, a.skin);
     px(x - 9, y - 36 - bob, 18, 7, a.hair);
@@ -657,9 +764,7 @@
       const ox = dir === 1 ? 3 : dir === 3 ? -3 : 0;
       px(x - 4 + ox, y - 28 - bob, 3, 3, '#1b1f2e');
       px(x + 2 + ox, y - 28 - bob, 3, 3, '#1b1f2e');
-    } else {
-      px(x - 5, y - 30 - bob, 10, 3, a.hair);
-    }
+    } else px(x - 5, y - 30 - bob, 10, 3, a.hair);
     px(x - 8, y - 4 - bob + step, 6, 12, shade(cloth, -28));
     px(x + 2, y - 4 - bob - step, 6, 12, shade(cloth, -28));
     px(x - 7, y + 6 - bob + step, 6, 3, '#1a1520');
@@ -672,30 +777,30 @@
     if (a.bot || a.coord) px(x - 7, y - 40 - bob, 14, 5, '#ffd76a');
     px(x + 9, y - 38 - bob, 9, 9, '#0e1016');
     px(x + 10, y - 37 - bob, 7, 7, corPresenca(a.presenca));
-    const label = a.ceo ? a.nome : a.name;
-    ctx.font = '700 10px system-ui,sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-    const tw = ctx.measureText(label).width + 10;
-    px(x - tw / 2, y + 12, tw, 13, 'rgba(8,10,16,.85)');
-    ctx.fillStyle = '#fff';
-    ctx.fillText(label, x, y + 14);
+
+    // nome sob o avatar, com anti-colisão / proximidade
+    if (nomeVisivel(a)) {
+      const label = a.ceo ? a.nome : a.name;
+      ctx.font = '700 10px system-ui,sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      const tw = ctx.measureText(label).width + 10;
+      let ny = y + 12;
+      for (const s of nameSlots) {
+        if (Math.abs(s.x - x) < (s.w + tw) / 2 && Math.abs(s.y - ny) < 13) ny = s.y + 13;
+      }
+      nameSlots.push({ x, y: ny, w: tw });
+      px(x - tw / 2, ny, tw, 13, 'rgba(8,10,16,.85)');
+      ctx.fillStyle = '#fff';
+      ctx.fillText(label, x, ny + 2);
+    }
     hits.push({ a, c: a.c, r: a.r, rad: 0.8 });
   }
   function drawFurniture() {
+    drawRoomDecor();
     drawDiretoria();
     drawCozinha();
     drawLounge();
     for (const a of agents) if (a.desk) drawDesk(a);
-    // plantas espalhadas
-    [[1, 9], [18, 8], [1, 15], [10, 16], [2, 25], [17, 22], [1, 31], [12, 31], [3, 43]].forEach(([c, r]) => {
-      if (livre(c, r) || true) drawPlant(c, r);
-    });
-    // janelas em salas
-    for (const rm of ROOMS) {
-      if (rm.ala === 'wear' || rm.h < 2) continue;
-      drawWindow(rm.c + 1, rm.r);
-      if (rm.w > 4) drawWindow(rm.c + rm.w - 2, rm.r);
-    }
   }
   function drawMiniMap() {
     if (!showMini || !miniCvs) return;
@@ -725,7 +830,7 @@
     camera();
     hits.length = 0;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.fillStyle = '#0f131c';
+    ctx.fillStyle = '#c4b08c';
     ctx.fillRect(0, 0, viewW, viewH);
     ctx.setTransform(dpr * cam.s, 0, 0, dpr * cam.s, dpr * cam.ox, dpr * cam.oy);
     ctx.imageSmoothingEnabled = false;
@@ -746,12 +851,13 @@
     }
 
     const lista = agents.slice().sort((a, b) => a.r - b.r || a.c - b.c);
+    const nameSlots = [];
     for (const a of lista) {
       if (modoFoco && salaAtual && a.roomId !== salaAtual.id && !a.ceo) {
         ctx.globalAlpha = 0.25;
-        drawAvatar(a);
+        drawAvatar(a, nameSlots);
         ctx.globalAlpha = 1;
-      } else drawAvatar(a);
+      } else drawAvatar(a, nameSlots);
     }
 
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -1007,13 +1113,24 @@
     const p = local(e);
     clique(p.x, p.y);
   });
+  cvs.addEventListener('pointermove', (e) => {
+    if (pinça.size) return;
+    const p = local(e);
+    const w = unproject(p.x, p.y);
+    hover = null;
+    let bd = 0.85;
+    for (const h of hits) {
+      if (!h.a) continue;
+      const d = Math.hypot(w.c - h.c, w.r - h.r);
+      if (d < bd) { bd = d; hover = h.a; }
+    }
+    cvs.style.cursor = hover ? 'pointer' : 'crosshair';
+  });
   cvs.addEventListener('wheel', (e) => {
     e.preventDefault();
     aplicarZoom(e.deltaY < 0 ? 1.12 : 1 / 1.12);
   }, { passive: false });
   // pinça
-  const pinça = new Map();
-  let pinçaDist = 0;
   cvs.addEventListener('pointerdown', (e) => {
     if (e.pointerType !== 'touch') return;
     pinça.set(e.pointerId, { x: e.clientX, y: e.clientY });

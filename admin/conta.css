@@ -1,7 +1,7 @@
-/* Seção "Conta" do /admin (informações, compartilhamento de acesso, segurança, atividades). Tema claro do painel. */
+/* Seção "Conta" do /admin (informações, compartilhamento de acesso, segurança, atividades). Tema escuro do painel. */
 .ct .container { max-width: 1080px; }
-.ct-status[data-tipo="ok"] { background: #e6f4d9; border-color: #b7d99a; }
-.ct-status[data-tipo="erro"] { background: #fde7e4; border-color: #e9b2ab; }
+.ct-status[data-tipo="ok"] { background: rgba(208, 239, 135, .14); border-color: rgba(208, 239, 135, .4); }
+.ct-status[data-tipo="erro"] { background: rgba(240, 144, 124, .14); border-color: rgba(240, 144, 124, .45); }
 .ct-cartao { margin: 0 0 20px; padding: 6px 20px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
 .ct-cartao > h2 { margin: 14px 0 6px; font-size: 18px; }
 .ct-linha { display: grid; grid-template-columns: minmax(150px, 240px) 1fr auto; gap: 12px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
@@ -9,7 +9,7 @@
 .ct-rotulo { font: 500 12px var(--font-mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
 .ct-valor { overflow-wrap: anywhere; }
 .ct-dica { display: block; margin: 8px 0 0; color: var(--muted); font-size: 13.5px; line-height: 1.5; }
-.ct-erro { margin: 0; padding: 10px 14px; border-radius: 10px; background: #fde7e4; color: #8c1d14; font-size: 14px; }
+.ct-erro { margin: 0; padding: 10px 14px; border-radius: 10px; background: rgba(240, 144, 124, .14); color: #f0907c; font-size: 14px; }
 .ct-vazio { padding: 36px 16px; text-align: center; color: var(--muted); }
 .ct-vazio strong { display: block; margin-bottom: 6px; color: var(--ink); font-size: 18px; }
 .ct-sub { margin: 36px 0 12px; font-size: 20px; }
@@ -37,14 +37,14 @@
 .ct-meta { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 14px 0; }
 .ct-meta dt { font: 500 11px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 .ct-meta dd { margin: 2px 0 0; font-size: 14px; overflow-wrap: anywhere; }
-.ct-perigo { color: #b3261e; border-color: #e3b5b0; }
+.ct-perigo { color: #f0907c; border-color: rgba(240, 144, 124, .45); }
 .ct-perigo-solido { background: #b3261e; border-color: #b3261e; color: #fff; }
 
 .ct-selo { display: inline-block; padding: 3px 10px; border-radius: 999px; font: 600 12px var(--font-body); white-space: nowrap; background: var(--tint); color: var(--ink); }
-.ct-selo--ativo { background: #e1f3d0; color: #2c5a0d; }
-.ct-selo--convite { background: #fdf0cf; color: #6b5000; }
-.ct-selo--suspenso { background: #eceae4; color: #55524a; }
-.ct-selo--expirado { background: #fde7e4; color: #8c1d14; }
+.ct-selo--ativo { background: rgba(208, 239, 135, .14); color: #d0ef87; }
+.ct-selo--convite { background: rgba(217, 165, 32, .16); color: #f7cf7e; }
+.ct-selo--suspenso { background: rgba(255, 255, 255, .07); color: var(--muted); }
+.ct-selo--expirado { background: rgba(240, 144, 124, .14); color: #f0907c; }
 
 .ct-canais-linha { display: grid; grid-template-columns: minmax(140px, 1fr) auto auto auto; gap: 14px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
 .ct-barra { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; margin: 0 0 12px; }

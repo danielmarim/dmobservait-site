@@ -85,7 +85,8 @@ if (form) {
 
   const compose = (data) => {
     const company = String(data.get('company') || '').trim();
-    return `Olá, equipe DM ObservaIT!\n\nMeu nome é ${String(data.get('name')).trim()}.${company ? `\nEmpresa: ${company}` : ''}\nÁrea de interesse: ${data.get('area')}\n\n${String(data.get('message')).trim()}`;
+    const replyTo = String(data.get('email') || '').trim();
+    return `Olá, equipe DM ObservaIT!\n\nMeu nome é ${String(data.get('name')).trim()}.${replyTo ? `\nE-mail: ${replyTo}` : ''}${company ? `\nEmpresa: ${company}` : ''}\nÁrea de interesse: ${data.get('area')}\n\n${String(data.get('message')).trim()}`;
   };
   const showPrepared = (message, area) => {
     output.value = message;

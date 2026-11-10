@@ -1,13 +1,13 @@
 /* Tela /admin/loja. Usa os tokens de ../styles.css e as classes do painel (admin.css). */
-.adm-status[data-tipo="ok"] { background: #edf6dc; border-color: #c9e39a; }
-.adm-status[data-tipo="erro"] { background: #fbe4e4; border-color: #e8b4b4; color: var(--danger); }
+.adm-status[data-tipo="ok"] { background: rgba(208, 239, 135, .14); border-color: rgba(208, 239, 135, .4); }
+.adm-status[data-tipo="erro"] { background: rgba(240, 144, 124, .14); border-color: rgba(240, 144, 124, .45); color: var(--danger); }
 .lj-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; align-items: start; }
 .lj-grid h2 { font-size: 22px; margin: 0; }
 .lj-lista-topo { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
 .lj-lista { display: grid; gap: 12px; margin-bottom: 18px; }
 .lj-item { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 8px 16px; padding: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
 .lj-item.lj-oculto { background: var(--tint); }
-.lj-oculto .lj-chip { background: #e6e9e4; color: var(--muted); }
+.lj-oculto .lj-chip { background: rgba(255, 255, 255, .07); color: var(--muted); }
 .lj-thumb img, .lj-thumb .ebook-cover-art { width: 64px; aspect-ratio: 2 / 3; height: auto; object-fit: cover; border-radius: 3px 6px 6px 3px; }
 .lj-thumb .ebook-cover-art { padding: 6px; font-size: 0; border-left-width: 3px; }
 .lj-thumb .ebook-cover-art .mono-label, .lj-thumb .ebook-cover-art .logo-mark { display: none; }
@@ -15,7 +15,7 @@
 .lj-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .lj-info strong { font: 650 17px/1.3 var(--font-head); color: var(--ink); }
 .lj-info > span { color: var(--muted); font-size: 14px; }
-.lj-chip { display: inline-block; padding: 1px 8px; border-radius: 999px; background: #edf6dc; color: var(--lime-ink); font: 500 11px/1.6 var(--font-mono); letter-spacing: .05em; text-transform: uppercase; }
+.lj-chip { display: inline-block; padding: 1px 8px; border-radius: 999px; background: rgba(208, 239, 135, .14); color: var(--lime-ink); font: 500 11px/1.6 var(--font-mono); letter-spacing: .05em; text-transform: uppercase; }
 .lj-botoes { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; }
 .lj-botoes .btn, .lj-acoes .btn, #lj-kiwify, #lj-capa-remover, #lj-baixar { min-height: 40px; padding: 8px 14px; font-size: 14px; }
 .lj-seta { min-width: 44px; }
@@ -26,7 +26,7 @@
 .lj-form-sec .btn { white-space: normal; text-align: center; }
 .lj-form-sec input[type="file"] { width: 100%; max-width: 100%; font-size: 14px; }
 .lj-form-sec label, .lj-capa legend { display: grid; gap: 6px; font: 600 14px/1.3 var(--font-body); color: var(--ink); }
-.lj-form-sec input[type="url"], .lj-form-sec input:not([type]), .lj-form-sec input[type="text"], .lj-form-sec textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 8px; font: 400 15px/1.45 var(--font-body); color: var(--text); background: #fff; }
+.lj-form-sec input[type="url"], .lj-form-sec input:not([type]), .lj-form-sec input[type="text"], .lj-form-sec textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--line-strong); border-radius: 8px; font: 400 15px/1.45 var(--font-body); color: var(--text); background: var(--bg); }
 .lj-form-sec small { font: 500 12px var(--font-mono); color: var(--muted); }
 .lj-dupla { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .lj-capa { min-width: 0; margin: 0; padding: 0; border: 0; }
